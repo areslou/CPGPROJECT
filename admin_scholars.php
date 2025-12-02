@@ -97,41 +97,71 @@ $scholarship_options = [
     <meta charset="UTF-8">
     <title>Scholars Management - LSS</title>
     <style>
+        html { font-size: 62.5%; } /* 1rem = 10px */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; display: flex; height: 100vh; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; display: flex; height: 100vh; font-size: 1.6rem; }
         
         /* SIDEBAR */
-        .sidebar { width: 260px; background: #00A36C; color: white; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 25px 20px; background: #006B4A; }
-        .sidebar-menu { padding: 20px 0; flex: 1; }
-        .menu-item { padding: 15px 25px; color: white; text-decoration: none; display: block; transition: 0.3s; border-left: 4px solid transparent; }
+        .sidebar { width: 26rem; background: #00A36C; color: white; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 2.5rem 2rem; background: #006B4A; }
+        .sidebar-menu { padding: 2rem 0; flex: 1; }
+        .menu-item { padding: 1.5rem 2.5rem; color: white; text-decoration: none; display: block; transition: 0.3s; border-left: 0.4rem solid transparent; }
         .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); border-left-color: #7FE5B8; }
         
-        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
-        .top-bar { background: white; padding: 20px 30px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
-        .content-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .main-content { flex: 1; padding: 3rem; overflow-y: auto; }
+        .top-bar { background: white; padding: 2rem 3rem; border-radius: 1rem; margin-bottom: 3rem; box-shadow: 0 0.2rem 0.5rem rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .content-card { background: white; padding: 3rem; border-radius: 1rem; box-shadow: 0 0.2rem 0.5rem rgba(0,0,0,0.05); }
         
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: 600; text-decoration: none; display: inline-block;}
+        .filter-bar { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        input, select { padding: 1rem; border: 0.1rem solid #ddd; border-radius: 0.5rem; }
+        .btn { padding: 1rem 2rem; border: none; border-radius: 0.5rem; cursor: pointer; color: white; font-weight: 600; text-decoration: none; display: inline-block;}
         .btn-primary { background: #00A36C; }
         .btn-secondary { background: #6c757d; }
-        .btn-danger { background: #dc3545; font-size: 12px; padding: 5px 10px; }
+        .btn-danger { background: #dc3545; font-size: 1.2rem; padding: 0.5rem 1rem; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; padding: 15px; background: #f8f9fa; color: #00A36C; border-bottom: 2px solid #ddd; }
-        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .badge { padding: 5px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+        th { text-align: left; padding: 1.5rem; background: #f8f9fa; color: #00A36C; border-bottom: 0.2rem solid #ddd; }
+        td { padding: 1.5rem; border-bottom: 0.1rem solid #eee; font-size: 1.4rem; }
+        .badge { padding: 0.5rem 1rem; border-radius: 1.5rem; font-size: 1.1rem; font-weight: bold; }
         .status-ACTIVE { background: #d4edda; color: #155724; }
         .status-ON-LEAVE { background: #fff3cd; color: #856404; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { background: white; margin: 50px auto; padding: 30px; width: 600px; border-radius: 10px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: bold; color: #555; }
-        .form-group input, .form-group select { width: 100%; }
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content { 
+            background: white; 
+            padding: 1.5rem; 
+            width: 90%; 
+            max-width: 60rem; 
+            border-radius: 1rem; 
+        }
+        #modalTitle {
+            margin-bottom: 2rem;
+            color: #00A36C;
+            font-size: 2.4rem;
+        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 1.3rem; font-weight: bold; color: #555; }
+        .form-group input, .form-group select { width: 100%; font-size: 1.6rem; padding: 1rem; border: 0.1rem solid #ddd; border-radius: 0.5rem; }
         .full-width { grid-column: span 2; }
+        .modal-buttons {
+            margin-top: 2rem;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -221,7 +251,7 @@ $scholarship_options = [
 <!-- MODAL FORM -->
 <div id="scholarModal" class="modal">
     <div class="modal-content">
-        <h2 id="modalTitle" style="margin-bottom: 20px; color: #00A36C;">Add Scholar</h2>
+        <h2 id="modalTitle">Add Scholar</h2>
         <form method="POST">
             <input type="hidden" name="is_edit" id="is_edit" value="0">
             <div class="form-grid">
@@ -271,7 +301,7 @@ $scholarship_options = [
                     </select>
                 </div>
             </div>
-            <div style="margin-top: 20px; text-align: right;">
+            <div class="modal-buttons">
                 <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 <button type="submit" name="save_scholar" class="btn btn-primary">Save Scholar</button>
             </div>
@@ -280,17 +310,34 @@ $scholarship_options = [
 </div>
 
 <script>
+function adjustModalScale() {
+    const modalContent = document.querySelector('#scholarModal .modal-content');
+    if (!modalContent) return;
+
+    modalContent.style.transform = ''; // Reset transform
+    const modalHeight = modalContent.offsetHeight;
+    const windowHeight = window.innerHeight;
+
+    if (modalHeight > windowHeight) {
+        const scale = windowHeight / modalHeight;
+        modalContent.style.transform = `scale(${scale})`;
+    }
+}
+
+window.addEventListener('resize', adjustModalScale);
+
 function openModal(mode) {
-    document.getElementById('scholarModal').style.display = 'block';
+    document.getElementById('scholarModal').classList.add('active');
     if(mode === 'add') {
         document.getElementById('modalTitle').innerText = "Add New Scholar";
         document.getElementById('is_edit').value = "0";
         document.querySelector('form').reset();
         document.getElementById('StudentNumber').readOnly = false;
     }
+    adjustModalScale();
 }
 function closeModal() {
-    document.getElementById('scholarModal').style.display = 'none';
+    document.getElementById('scholarModal').classList.remove('active');
 }
 function editScholar(data) {
     openModal('edit');
