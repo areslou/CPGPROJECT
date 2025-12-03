@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             /* CHANGE THIS LINE TO YOUR LOCAL FILE NAME */
-            background: url('"C:\Users\Ares\Downloads\Final Project.gif"') no-repeat center center fixed; 
+            background: url('Final Project (1).gif') no-repeat center center fixed; 
             background-size: cover;
             display: flex; 
             align-items: center; 
