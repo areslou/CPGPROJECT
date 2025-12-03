@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">in 
     <title>Login - LSS System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             /* CHANGE THIS LINE TO YOUR LOCAL FILE NAME */
-            background: url('Main Page Background.gif') no-repeat center center fixed; 
+            background: url('main-page-background.gif') no-repeat center center fixed; 
             background-size: cover;
             display: flex; 
             align-items: center; 
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .login-container { 
-            background: rgba(252, 249, 244, 0.95); /* Slightly transparent white card */
+            background: rgba(255, 255, 255, 0.95); /* Slightly transparent white card */
             padding: 2.5rem; 
             border-radius: 12px; 
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); 
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 100%; 
             padding: 0.85rem; 
             background: #00A36C; 
-            color: #fcf9f4; 
+            color: white; 
             border: none; 
             border-radius: 6px; 
             font-size: 1.1rem; 
