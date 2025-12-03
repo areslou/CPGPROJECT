@@ -39,16 +39,16 @@ if (!$me) {
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
         
         /* TOP NAVIGATION */
-        .navbar { background: #00A36C; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .navbar { background: #00A36C; color: #fcf9f4; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .navbar h1 { margin: 0; font-size: 20px; }
-        .logout-btn { color: white; text-decoration: none; padding: 8px 15px; border: 1px solid white; border-radius: 5px; font-size: 14px; transition: 0.3s; }
-        .logout-btn:hover { background: white; color: #00A36C; }
+        .logout-btn { color: #fcf9f4; text-decoration: none; padding: 8px 15px; border: 1px solid #fcf9f4; border-radius: 5px; font-size: 14px; transition: 0.3s; }
+        .logout-btn:hover { background: #fcf9f4; color: #00A36C; }
 
         /* MAIN LAYOUT */
         .container { max-width: 900px; margin: 40px auto; padding: 20px; display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
         
         /* CARDS */
-        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .card { background: #fcf9f4; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         
         /* PROFILE LEFT */
         .profile-pic { width: 100px; height: 100px; background: #e9ecef; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #00A36C; }
@@ -68,7 +68,7 @@ if (!$me) {
         .edit-zone { background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px dashed #ccc; }
         .form-row { display: flex; gap: 10px; }
         input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        button.save-btn { background: #00A36C; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button.save-btn { background: #00A36C; color: #fcf9f4; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         button.save-btn:hover { background: #008f5d; }
         
         .alert { padding: 10px; background: #d4edda; color: #155724; border-radius: 5px; margin-bottom: 20px; text-align: center; }

@@ -73,7 +73,7 @@ $requirements = [
         /* NAVBAR */
         .navbar {
             background: var(--primary);
-            color: white;
+            color: #fcf9f4;
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
@@ -84,7 +84,7 @@ $requirements = [
         .user-info { font-size: 0.9rem; display: flex; align-items: center; gap: 15px; }
         .logout-btn {
             background: rgba(255,255,255,0.2);
-            color: white;
+            color: #fcf9f4;
             text-decoration: none;
             padding: 0.5rem 1rem;
             border-radius: 4px;
@@ -104,8 +104,8 @@ $requirements = [
         }
 
         /* CARDS */
-        .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 1.5rem; }
-        .card-header { padding: 1.25rem; border-bottom: 1px solid #eee; background: white; }
+        .card { background: #fcf9f4; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 1.5rem; }
+        .card-header { padding: 1.25rem; border-bottom: 1px solid #eee; background: #fcf9f4; }
         .card-header h3 { font-size: 1.1rem; color: var(--primary-dark); margin: 0; }
         .card-body { padding: 1.5rem; }
 
@@ -148,7 +148,7 @@ $requirements = [
         .form-label { display: block; font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 0.5rem; text-align: left; }
         .input-group { display: flex; gap: 10px; }
         .form-input { flex: 1; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
-        .btn-submit { background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .btn-submit { background: var(--primary); color: #fcf9f4; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 600; }
         .btn-submit:hover { background: var(--primary-dark); }
 
         /* TASK TRACKER TABLE */

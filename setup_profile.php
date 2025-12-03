@@ -43,7 +43,7 @@ try {
         }
         .navbar {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            color: #fcf9f4;
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
@@ -59,7 +59,7 @@ try {
             align-items: center;
         }
         .nav-links a {
-            color: white;
+            color: #fcf9f4;
             text-decoration: none;
             padding: 8px 16px;
             border-radius: 5px;
@@ -74,7 +74,7 @@ try {
             padding: 0 20px;
         }
         .profile-card {
-            background: white;
+            background: #fcf9f4;
             padding: 40px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -94,7 +94,7 @@ try {
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #fcf9f4;
             font-size: 48px;
             font-weight: bold;
         }
@@ -130,7 +130,7 @@ try {
         }
         .scholarship-badge {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            color: #fcf9f4;
             padding: 15px;
             border-radius: 8px;
             margin-top: 30px;

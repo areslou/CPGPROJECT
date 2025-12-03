@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             /* CHANGE THIS LINE TO YOUR LOCAL FILE NAME */
-            background: url('Final Project (1).gif') no-repeat center center fixed; 
+            background: url('Main Page Background.gif') no-repeat center center fixed; 
             background-size: cover;
             display: flex; 
             align-items: center; 
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .login-container { 
-            background: rgba(255, 255, 255, 0.95); /* Slightly transparent white card */
+            background: rgba(252, 249, 244, 0.95); /* Slightly transparent white card */
             padding: 2.5rem; 
             border-radius: 12px; 
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); 
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 100%; 
             padding: 0.85rem; 
             background: #00A36C; 
-            color: white; 
+            color: #fcf9f4; 
             border: none; 
             border-radius: 6px; 
             font-size: 1.1rem; 

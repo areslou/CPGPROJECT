@@ -102,19 +102,19 @@ $scholarship_options = [
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; display: flex; height: 100vh; font-size: 1.6rem; background-image: url('Main Sub Page Background.gif'); }
         
         /* SIDEBAR */
-        .sidebar { width: 26rem; background: #00A36C; color: white; display: flex; flex-direction: column; }
+        .sidebar { width: 26rem; background: #00A36C; color: #fcf9f4; display: flex; flex-direction: column; }
         .sidebar-header { padding: 2.5rem 2rem; background: #006B4A; }
         .sidebar-menu { padding: 2rem 0; flex: 1; }
-        .menu-item { padding: 1.5rem 2.5rem; color: white; text-decoration: none; display: block; transition: 0.3s; border-left: 0.4rem solid transparent; }
+        .menu-item { padding: 1.5rem 2.5rem; color: #fcf9f4; text-decoration: none; display: block; transition: 0.3s; border-left: 0.4rem solid transparent; }
         .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); border-left-color: #7FE5B8; }
         
         .main-content { flex: 1; padding: 3rem; overflow-y: auto; }
-        .top-bar { background: white; padding: 2rem 3rem; border-radius: 1rem; margin-bottom: 3rem; box-shadow: 0 0.2rem 0.5rem rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
-        .content-card { background: white; padding: 3rem; border-radius: 1rem; box-shadow: 0 0.2rem 0.5rem rgba(0,0,0,0.05); }
+        .top-bar { background: #fcf9f4; padding: 2rem 3rem; border-radius: 1rem; margin-bottom: 3rem; box-shadow: 0 0.2rem 0.5rem rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .content-card { background: #fcf9f4; padding: 3rem; border-radius: 1rem; box-shadow: 0 0.2rem 0.5rem rgba(0,0,0,0.05); }
         
         .filter-bar { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
         input, select { padding: 1rem; border: 0.1rem solid #ddd; border-radius: 0.5rem; }
-        .btn { padding: 1rem 2rem; border: none; border-radius: 0.5rem; cursor: pointer; color: white; font-weight: 600; text-decoration: none; display: inline-block;}
+        .btn { padding: 1rem 2rem; border: none; border-radius: 0.5rem; cursor: pointer; color: #fcf9f4; font-weight: 600; text-decoration: none; display: inline-block;}
         .btn-primary { background: #00A36C; }
         .btn-secondary { background: #6c757d; }
         .btn-danger { background: #dc3545; font-size: 1.2rem; padding: 0.5rem 1rem; }
@@ -142,7 +142,7 @@ $scholarship_options = [
             display: flex;
         }
         .modal-content { 
-            background: white; 
+            background: #fcf9f4; 
             padding: 1.5rem; 
             width: 90%; 
             max-width: 60rem; 
