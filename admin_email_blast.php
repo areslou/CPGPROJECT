@@ -54,7 +54,8 @@ $scholarship_options = [
     'Aboitiz Scholarship',
     'Gokongwei Next Gen Scholarship for Excellence',
     'Alvarez Foundation Scholarship',
-    'UT Foundation Inc.'
+    'UT Foundation Inc.',
+    'Php Scholarship'
 ];
 ?>
 
