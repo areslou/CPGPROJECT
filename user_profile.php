@@ -83,7 +83,7 @@ if (!$me) {
 
     <div class="container">
         <div class="card">
-            <div class="profile-pic">🎓</div>
+            <div class="profile-pic">👤</div>
             <div class="student-name"><?php echo htmlspecialchars($me['FirstName'] . ' ' . $me['LastName']); ?></div>
             <div class="student-id">ID: <?php echo htmlspecialchars($me['StudentNumber']); ?></div>
             
