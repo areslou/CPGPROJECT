@@ -35,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message_status = "Success! Blast email queued for <strong>$count</strong> scholars.";
 }
 
-
 // Get scholarships for dropdown
 $scholarship_options = [
     'St. La Salle Financial Assistance Grant',
