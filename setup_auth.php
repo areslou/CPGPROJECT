@@ -1,5 +1,6 @@
 <?php
 // setup_auth.php
+//hello
 require_once 'config.php';
 
 try {
