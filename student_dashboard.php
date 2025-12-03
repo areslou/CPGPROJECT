@@ -61,7 +61,7 @@ $requirements = [
     <style>
         /* LASALLIAN GREEN THEME */
         :root {
-            --primary: #00A36C;
+            --primary: #008259;
             --primary-dark: #006B4A;
             --accent: #f8f9fa;
             --text: #333;

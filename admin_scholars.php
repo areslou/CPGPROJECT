@@ -103,7 +103,7 @@ $scholarship_options = [
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; display: flex; height: 100vh; font-size: 1.6rem; background-image: url('Main%20Sub%20Page%20Background.gif'); }
         
         /* SIDEBAR */
-        .sidebar { width: 26rem; background: #00A36C; color: #fcf9f4; display: flex; flex-direction: column; }
+        .sidebar { width: 26rem; background: #008259; color: #fcf9f4; display: flex; flex-direction: column; }
         .sidebar-header { padding: 2.5rem 2rem; background: #006B4A; }
         .sidebar-menu { padding: 2rem 0; flex: 1; }
         .menu-item { padding: 1.5rem 2.5rem; color: #fcf9f4; text-decoration: none; display: block; transition: 0.3s; border-left: 0.4rem solid transparent; }

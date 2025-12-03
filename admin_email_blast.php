@@ -68,7 +68,7 @@ $scholarship_options = [
         /* Shared CSS */
         body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; display: flex; height: 100vh; margin: 0; background-image: url('Main%20Sub%20Page%20Background.gif');}
         
-        .sidebar { width: 260px; background: #00A36C; color: #fcf9f4; display: flex; flex-direction: column; }
+        .sidebar { width: 260px; background: #008259; color: #fcf9f4; display: flex; flex-direction: column; }
         .sidebar-header { padding: 25px 20px; background: #006B4A; }
         .menu-item { padding: 15px 25px; color: #fcf9f4; text-decoration: none; display: block; border-left: 4px solid transparent; transition: 0.3s; }
         .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); border-left-color: #7FE5B8; }
