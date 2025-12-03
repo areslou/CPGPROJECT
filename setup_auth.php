@@ -1,6 +1,6 @@
 <?php
 // setup_auth.php
-//hello
+//hello brendan
 require_once 'config.php';
 
 try {
