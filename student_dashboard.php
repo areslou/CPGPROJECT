@@ -186,7 +186,7 @@ $requirements = [
     <aside>
         <div class="card profile-card">
             <div class="card-body">
-                <div class="profile-avatar">🎓</div>
+                <div class="profile-avatar">👤</div>
                 <div class="student-name">
                     <?= htmlspecialchars($student['FirstName'] . ' ' . $student['LastName']) ?>
                 </div>
