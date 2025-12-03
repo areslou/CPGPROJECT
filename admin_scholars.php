@@ -100,7 +100,7 @@ $scholarship_options = [
     <style>
         html { font-size: 62.5%; } /* 1rem = 10px */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; display: flex; height: 100vh; font-size: 1.6rem; background-image: url('Main Sub Page Background.gif'); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; display: flex; height: 100vh; font-size: 1.6rem; background-image: url('Main%20Sub%20Page%20Background.gif'); }
         
         /* SIDEBAR */
         .sidebar { width: 26rem; background: #00A36C; color: #fcf9f4; display: flex; flex-direction: column; }

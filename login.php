@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             /* CHANGE THIS LINE TO YOUR LOCAL FILE NAME */
-            background: url('main-page-background.gif') no-repeat center center fixed; 
+            background: url('Main%20Page%20Background.gif') no-repeat center center fixed; 
             background-size: cover;
             display: flex; 
             align-items: center; 

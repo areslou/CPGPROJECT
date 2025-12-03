@@ -66,7 +66,7 @@ $scholarship_options = [
     <title>Email Blast - LSS</title>
     <style>
         /* Shared CSS */
-        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; display: flex; height: 100vh; margin: 0; background-image: url('Main Sub Page Background.gif');}
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; display: flex; height: 100vh; margin: 0; background-image: url('Main%20Sub%20Page%20Background.gif');}
         
         .sidebar { width: 260px; background: #00A36C; color: #fcf9f4; display: flex; flex-direction: column; }
         .sidebar-header { padding: 25px 20px; background: #006B4A; }
