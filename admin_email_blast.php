@@ -100,7 +100,7 @@ $scholarship_options = [
 
 <main class="main-content">
     <div class="top-bar">
-        <h1 style="color:#00A36C; margin:0;">📢 Email Blast</h1>
+        <h1 style="color:black; margin:0;">📢 Email Blast</h1>
         <!-- BACK BUTTON -->
         <a href="admin_dashboard.php" class="btn-secondary">← Back to Dashboard</a>
     </div>
