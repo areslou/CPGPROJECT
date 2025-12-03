@@ -39,6 +39,7 @@ try {
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f5f5f5;
+            background-image: url('Main Sub Page Background.gif');
         }
         .navbar {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

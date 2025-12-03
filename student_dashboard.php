@@ -68,7 +68,7 @@ $requirements = [
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: var(--text); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: var(--text); background-image: url('Main Sub Page Background.gif'); }
         
         /* NAVBAR */
         .navbar {

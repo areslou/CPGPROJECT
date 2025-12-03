@@ -39,7 +39,7 @@ try {
     <style>
         /* LASALLIAN GREEN THEME */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; display: flex; height: 100vh; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; display: flex; height: 100vh; background-image: url('Main Sub Page Background.gif'); }
         
         /* SIDEBAR */
         .sidebar { width: 260px; background: #00A36C; color: white; display: flex; flex-direction: column; }
