@@ -140,7 +140,7 @@ try {
     </div>
 
     <!-- QUICK ACTIONS SECTION -->
-    <h3 style="margin-bottom: 15px; color: #555;">Quick Actions</h3>
+    <h3 style="margin-bottom: 15px; color: #fcf9f4;">Quick Actions</h3>
     <div class="actions-grid">
         <div class="action-card">
             <h3>Manage Scholars</h3>
