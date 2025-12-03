@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS StudentDetails (
     Email         VARCHAR(100),
     Scholarship   VARCHAR(150),
     Status        VARCHAR(20),
-    ContactNumber VARCHAR(20)
+    ContactNumber VARCHAR(20),
+    ProfilePicture VARCHAR(255) NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS users (
