@@ -14,13 +14,17 @@ if (isset($_GET['delete'])) {
 
 // --- HANDLE CREATE/UPDATE ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_scholar'])) {
+    // --- HANDLE SCHOLARSHIP ARRAY ---
+    $scholarship_array = isset($_POST['Scholarship']) && is_array($_POST['Scholarship']) ? $_POST['Scholarship'] : [];
+    $schol = implode(' & ', $scholarship_array);
+    // ---
+
     $s_num = trim($_POST['StudentNumber']);
     $lname = strtoupper(trim($_POST['LastName'])); // AUTO CONVERT TO UPPERCASE
     $fname = trim($_POST['FirstName']);
     $mname = trim($_POST['MiddleName']);
     $degree = trim($_POST['DegreeProgram']);
     $email = trim($_POST['Email']);
-    $schol = trim($_POST['Scholarship']);
     $status = $_POST['Status'];
     $contact = trim($_POST['ContactNumber']);
 
@@ -78,8 +82,8 @@ $where = [];
 $params = [];
 
 if (!empty($_GET['scholarship'])) {
-    $where[] = "Scholarship = ?";
-    $params[] = $_GET['scholarship'];
+    $where[] = "Scholarship LIKE ?";
+    $params[] = '%' . $_GET['scholarship'] . '%';
 }
 if (!empty($_GET['status'])) {
     $where[] = "Status = ?";
@@ -217,6 +221,17 @@ $scholarship_options = [
             font-style: italic; 
         }
         
+        .scholarship-badge { 
+            display: inline-block; 
+            padding: 0.4rem 0.8rem; 
+            font-size: 1.1rem; 
+            margin: 0.2rem; 
+            border-radius: 0.4rem; 
+            background: #e9ecef; 
+            color: #495057; 
+            border: 1px solid #dee2e6;
+        }
+        
         /* Alert Messages */
         .alert {
             padding: 1.5rem;
@@ -322,7 +337,16 @@ $scholarship_options = [
                         <small style="color:#888"><?php echo htmlspecialchars($row['Email']); ?></small>
                     </td>
                     <td><?php echo htmlspecialchars($row['DegreeProgram']); ?></td>
-                    <td><small><?php echo htmlspecialchars(substr($row['Scholarship'], 0, 30)) . '...'; ?></small></td>
+                    <td>
+                        <?php 
+                            $scholarships = explode(' & ', $row['Scholarship']);
+                            foreach ($scholarships as $scholarship) {
+                                if (!empty($scholarship)) {
+                                    echo '<span class="scholarship-badge">' . htmlspecialchars(trim($scholarship)) . '</span>';
+                                }
+                            }
+                        ?>
+                    </td>
                     <td>
                         <span class="badge status-<?php echo str_replace(' ', '-', $row['Status']); ?>">
                             <?php echo htmlspecialchars($row['Status']); ?>
@@ -383,9 +407,9 @@ $scholarship_options = [
                     <div class="error-message" id="error_email">Email must be in format: username@dlsu.edu.ph</div>
                 </div>
                 <div class="form-group full-width">
-                    <label>Scholarship *</label>
-                    <select name="Scholarship" id="ScholarshipSelect" required>
-                        <option value="">-- Select Scholarship --</option>
+                    <label>Scholarship(s)</label>
+                    <div class="hint">Hold Ctrl (or Cmd on Mac) to select multiple</div>
+                    <select name="Scholarship[]" id="ScholarshipSelect" class="form-control" multiple size="8">
                         <?php foreach($scholarship_options as $s): ?>
                             <option value="<?php echo htmlspecialchars($s); ?>"><?php echo htmlspecialchars($s); ?></option>
                         <?php endforeach; ?>
@@ -586,7 +610,24 @@ function editScholar(data) {
     document.getElementById('MiddleName').value = data.MiddleName;
     document.getElementById('DegreeProgram').value = data.DegreeProgram;
     document.getElementById('Email').value = data.Email;
-    document.getElementById('ScholarshipSelect').value = data.Scholarship; 
+    
+    // --- HANDLE MULTI-SELECT SCHOLARSHIP ---
+    const scholarshipSelect = document.getElementById('ScholarshipSelect');
+    const selectedScholarships = data.Scholarship.split(' & ').map(s => s.trim());
+    
+    // Reset all options
+    for (let i = 0; i < scholarshipSelect.options.length; i++) {
+        scholarshipSelect.options[i].selected = false;
+    }
+    
+    // Select the correct options
+    for (let i = 0; i < scholarshipSelect.options.length; i++) {
+        if (selectedScholarships.includes(scholarshipSelect.options[i].value)) {
+            scholarshipSelect.options[i].selected = true;
+        }
+    }
+    // --- END HANDLE MULTI-SELECT ---
+    
     document.getElementById('Status').value = data.Status;
     document.getElementById('ContactNumber').value = data.ContactNumber;
     

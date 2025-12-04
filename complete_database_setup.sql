@@ -178,4 +178,43 @@ INSERT INTO StudentDetails (StudentNumber, LastName, FirstName, MiddleName, Degr
 (12476242, 'SAN JOSE', 'Kyrstie Joyce Ann', 'L.', 'BSITS', 'kyrstie_sanjose@dlsu.edu.ph', 'St. La Salle Financial Assistance Grant & DOST-SEI RA 7687 Scholarship', 'ON LEAVE', '0976 071 5305'),
 (12325775, 'VALENZUELA', 'Alexis Caitlin', 'L.', 'BS STAT', 'alexis_valenzuela@dlsu.edu.ph', 'Brother President Scholarship Program & DOST-SEI Merit Scholarship', 'ACTIVE', '0915 028 9928'),
 (12310514, 'CHUA', 'Joshua Emmanuel', 'M.', 'BS-CE', 'joshua_emmanuel_chua@dlsu.edu.ph', 'DOST-SEI Merit Scholarship', 'ACTIVE', '0933 987 7655'),
-(12509299, 'DEL RIO', 'Dylan', 'D.', 'BSCE', 'dylan_d_delrio@dlsu.edu.ph', 'V
+(12509299, 'DEL RIO', 'Dylan', 'D.', 'BSCE', 'dylan_d_delrio@dlsu.edu.ph', 'Vaugirard Scholarship Program & DOST-SEI Merit Scholarship', 'ACTIVE', '0968 788 3057'),
+(12516791, 'OCHO', 'Ma. Tricia Jasmin', 'M.', 'BS-HBIO', 'ma_tricia_jasmin_ocho@dlsu.edu.ph', 'STAR Scholarship', 'ACTIVE', '0969 322 4140 ');
+
+-- ==========================================
+-- 4. INSERT CSV DATA (BATCH 3 of 3)
+-- ==========================================
+INSERT INTO StudentDetails (StudentNumber, LastName, FirstName, MiddleName, DegreeProgram, Email, Scholarship, Status, ContactNumber) VALUES
+(12536784, 'DELA PAZ', 'Luisa Marie', 'V.', 'BS-APC', 'luisa_marie_v_delapaz@dlsu.edu.ph', 'St. La Salle Financial Assistance Grant', 'ACTIVE', '09613016500'),
+(12531286, 'GO', 'Kyza Deniece', 'T.', 'BS-APC', 'kyza_deniece_go@dlsu.edu.ph', 'St. La Salle Financial Assistance Grant', 'ACTIVE', '0995 479 0787 '),
+(12230359, 'LARAÑO', 'Dwaine Ira', 'K.', 'BS BIO-MBB', 'dwaine_larano@dlsu.edu.ph', 'DOST-SEI Merit Scholarship', 'ACTIVE', '09292959933'),
+(12515078, 'SOLIVEN', 'Alessia Isabel', 'D.', 'BSE-MTH', 'alessia_soliven@dlsu.edu.ph', 'Br. Andrew Gonzalez Academic Scholarship', 'ACTIVE', '09276887618'),
+(12515361, 'LUMBO', 'Eduard Cris', 'A.', 'BS CHYB', 'eduard_lumbo@dlsu.edu.ph', 'DOST-SEI RA 7687 Scholarship', 'ACTIVE', '09773819189'),
+(12448508, 'CORTEZ', 'Von Lemoure', 'R.', 'BSMS-CHE', 'von_cortez@dlsu.edu.ph', 'St. La Salle Financial Assistance Grant', 'ACTIVE', '09916752648'),
+(12513989, 'SAN AGUSTIN', 'Sebastien Mikhail', 'A.', 'BS-BCHEM', 'sebastien_sanagustin@dlsu.edu.ph', 'Vaugirard Scholarship Program & DOST-SEI Merit Scholarship', 'ACTIVE', '09478925906'),
+(12505676, 'MIZUNO', 'Hailie Beatrice', 'L.', 'AEF-MKT', 'hailie_mizuno@dlsu.edu.ph', 'St. La Salle Financial Assistance Grant', 'ACTIVE', '09166336540'),
+(12528250, 'GUISDAN', 'Pauleen Mariah', 'S.', 'BS-BIOMED', 'pauleen_guisdan@dlsu.edu.ph', 'DOST-SEI Merit Scholarship & St. La Salle Financial Assistance Grant', 'ACTIVE', '09153202319'),
+(12271879, 'Visto', 'Herise Janah', 'F.', 'BS-IT', 'herise_visto@dlsu.edu.ph', 'St. La Salle Financial Assistance Grant', 'ACTIVE', '09774572109'),
+(12516538, 'LACEDA', 'Dion John Tyler', 'S.', 'BS-CHY', 'dion_laceda@dlsu.edu.ph', 'Vaugirard Scholarship Program & DOST-SEI Merit Scholarship', 'ACTIVE', '09665341042'),
+(12511900, 'REGENCIA', 'John Angelo', 'R.', 'BSMEEMTE14', 'john_angelo_regencia@dlsu.edu.ph', 'St. La Salle Financial Assistance Grant', 'ACTIVE', '09949769098'),
+(12423270, 'ASTRERA', 'Sofia Ysabelle', 'C.', 'BS-PSYC', 'sofia_astrera@dlsu.edu.ph', 'DOST-SEI Merit Scholarship', 'ACTIVE', '09970866886'),
+(12421553, 'MANIQUIS', 'Neil Kyle', 'O.', 'BS PHY-MI', 'neil_maniquis@dlsu.edu.ph', 'STAR Scholarship & DOST-SEI RA 7687 Scholarship', 'ACTIVE', '0922 734 7174'),
+(12373419, 'MARASIGAN', 'Gyrard Michael', 'C.', 'BS BIO-MEDS', 'gyrard_marasigan@dlsu.edu.ph', 'DOST-SEI Merit Scholarship', 'ACTIVE', '0919 009 6182'),
+(12430013, 'NAVAREZ', 'Jona Gabriella', 'S.', 'BS-PSYC', 'jona_navarez@dlsu.edu.ph', 'Brother President Scholarship Program & DOST-SEI Merit Scholarship', 'ACTIVE', '0954 406 4772'),
+(12324477, 'OCHO', 'Martin Johan', 'M.', 'BS-STAT', 'martin_johan_ocho@dlsu.edu.ph', 'STAR Scholarship & DOST-SEI Merit Scholarship', 'ACTIVE', '0936 908 5940'),
+(12414638, 'ONG', 'Kien Patrick Zharvy', 'A.', 'BS-IT', 'kien_ong@dlsu.edu.ph', 'Animo Grant & DOST-SEI Merit Scholarship', 'ACTIVE', '0927 368 6390'),
+(12416819, 'DELA NOCHE', 'Arianne', 'C.', 'BS-HUMBIO', 'arianne_delanoche@dlsu.edu.ph', 'St. La Salle Financial Assistance Grant', 'ACTIVE', '0945 295 7831'),
+(12528013, 'GIMAO', 'Cheyen', 'A.', 'BS-PSYC', 'cheyen_gimao@dlsu.edu.ph', 'St. La Salle Financial Assistance Grant', 'ACTIVE', '0997 997 0741'),
+(12515477, 'ROMUALDO', 'Jim Boone', 'S.', 'BS-CHY', 'jim_romualdo@dlsu.edu.ph', 'STAR Scholarship & DOST-SEI Merit Scholarship', 'ACTIVE', '0991 339 2497'),
+(12447943, 'CAO', 'Eljan', 'R.', 'BSMS CIV', 'eljan_cao@dlsu.edu.ph', 'Animo Grant & DOST-SEI Merit Scholarship', 'ACTIVE', '0926 027 5049'),
+(12479047, 'BUENSALIDA', 'Cielo Mae', 'B.', 'BECED', 'cielo_buensalida@dlsu.edu.ph', 'St. La Salle Financial Assistance Grant', 'ACTIVE', '0993 865 9243');
+
+-- ==========================================
+-- 5. INSERT USERS (ADMIN & STUDENT)
+-- Passwords are hashed using BCrypt.
+-- Default Admin: admin@lss.org / admin123
+-- Default Student: larry_lanada@dlsu.edu.ph / student123
+-- ==========================================
+INSERT INTO users (email, password, role, student_number) VALUES
+('admin@lss.org', '$2y$10$IbVgOyyrQ6ekecLdCMwSMuTZqbYqGPohYPcVWMdQuiEzRWCC4eHs.', 'admin', NULL),
+('larry_lanada@dlsu.edu.ph', '$2y$10$PyouvDTBnKE8Vpgjio22YutRz5RU1UhDwUl7hQvll/bN3.WoFzXq.', 'student', 12278440);

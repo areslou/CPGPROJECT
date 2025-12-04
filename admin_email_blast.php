@@ -1,6 +1,9 @@
 <?php
 // admin_email_blast.php
 
+// Set a consistent timezone
+date_default_timezone_set('UTC');
+
 // --------------------------------------------------------------------------
 // 1. SETUP PHPMAILER (Manual Method)
 // --------------------------------------------------------------------------
@@ -20,6 +23,17 @@ require_once 'auth_check.php';
 requireAdmin();
 require_once 'config.php';
 
+// --- LOGGING SETUP ---
+$log_file = __DIR__ . '/admin_blast.log';
+if (file_exists($log_file)) {
+    unlink($log_file); // Clear log on each run for easier debugging
+}
+function write_log($message) {
+    global $log_file;
+    $timestamp = date('Y-m-d H:i:s');
+    file_put_contents($log_file, "[$timestamp] " . $message . "\n", FILE_APPEND);
+}
+
 // Increase timeout limit to 5 minutes (sending emails takes time)
 set_time_limit(300); 
 
@@ -34,92 +48,117 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $target_status = $_POST['target_status'];
     $subject_line = $_POST['subject'];
     $body_content = $_POST['message'];
-    
-    // A. Build Query to find recipients
-    // This logic ensures we only get students from the selected group
-    $sql = "SELECT Email, FirstName, LastName FROM StudentDetails WHERE 1=1";
-    $params = [];
-    
-    if ($target_schol != 'all') {
-        $sql .= " AND Scholarship = ?";
-        $params[] = $target_schol;
-    }
-    if ($target_status != 'all') {
-        $sql .= " AND Status = ?";
-        $params[] = $target_status;
-    }
-    
-    $stmt = $conn->prepare($sql);
-    $stmt->execute($params);
-    $recipients = $stmt->fetchAll();
-    
-    $count = count($recipients);
-    $sent_count = 0;
-    
-    // B. Start Email Sending Process
-    if ($count > 0) {
-        $mail = new PHPMailer(true);
+    $schedule_email = isset($_POST['schedule_email']);
+    $schedule_time = $_POST['schedule_time'] ?? null;
 
+    write_log("---" . " FORM SUBMITTED ---");
+    write_log("Target Scholarship: " . $target_schol);
+    write_log("Target Status: " . $target_status);
+
+    // --- IF SCHEDULING IS ENABLED ---
+    if ($schedule_email && !empty($schedule_time)) {
         try {
-            // --- SERVER SETTINGS (GMAIL) ---
-            $mail->isSMTP();                                            
-            $mail->Host       = 'smtp.gmail.com';                     
-            $mail->SMTPAuth   = true;                                   
-            
-            // =================================================================
-            // 🛑 YOU MUST EDIT THESE TWO LINES FOR IT TO WORK 🛑
-            // =================================================================
-            $mail->Username   = 'societyscholars3@gmail.com';         // <--- PUT YOUR REAL GMAIL HERE
-            $mail->Password   = 'wznztwaofzqwrwqf';          // <--- PUT YOUR 16-CHAR APP PASSWORD HERE
-            // =================================================================
-            
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            
-            $mail->Port       = 587;                                    
-
-            // --- SENDER INFO ---
-            $mail->setFrom($mail->Username, 'LSS Admin'); // Uses your email as the "From" address
-
-            // --- CONTENT SETTINGS ---
-            $mail->isHTML(true);                                  
-            $mail->Subject = $subject_line;
-
-            // --- LOOP THROUGH STUDENTS ---
-            foreach($recipients as $student) {
-                try {
-                    // 1. Add Recipient
-                    $mail->addAddress($student['Email'], $student['FirstName']); 
-
-                    // 2. Personalize Message (Replace {name} with actual First Name)
-                    $personalized_body = str_replace('{name}', $student['FirstName'], $body_content);
-                    $mail->Body = $personalized_body;
-
-                    // 3. Send
-                    $mail->send();
-                    $sent_count++;
-
-                    // 4. CLEAR ADDRESS (Critical for Loops!)
-                    $mail->clearAddresses();
-                    
-                } catch (Exception $e) {
-                    // If one email fails, log the error and continue to the next
-                    $debug_log .= "Failed to send to " . $student['Email'] . ": " . $mail->ErrorInfo . "<br>";
-                    $mail->getSMTPInstance()->reset(); // Reset connection to try next one
-                    $mail->clearAddresses();
-                    continue; 
-                }
-            }
-            
-            if ($sent_count == 0) {
-                $message_status = "<span style='color:red;'>Failed. 0 emails sent. See debug log below.</span>";
-            } else {
-                $message_status = "<span style='color:green;'>Success! Blast email sent to <strong>$sent_count</strong> out of <strong>$count</strong> scholars.</span>";
-            }
-
-        } catch (Exception $e) {
-            $message_status = "<span style='color:red;'>Critical Mailer Error: {$mail->ErrorInfo}</span>";
+            $stmt = $conn->prepare(
+                "INSERT INTO ScheduledEmails (subject, body, target_scholarship, target_status, scheduled_at, status) 
+                 VALUES (?, ?, ?, ?, ?, 'pending')"
+            );
+            $stmt->execute([$subject_line, $body_content, $target_schol, $target_status, $schedule_time]);
+            $message_status = "<span style='color:green;'>✅ Success! Your email has been scheduled for " . date("F j, Y, g:i a", strtotime($schedule_time)) . ".</span>";
+        } catch (PDOException $e) {
+            $message_status = "<span style='color:red;'>❌ Database Error: Could not schedule the email. " . $e->getMessage() . "</span>";
         }
     } else {
-        $message_status = "<span style='color:orange;'>No scholars found matching those filters.</span>";
+        // --- ELSE, SEND IMMEDIATELY (EXISTING LOGIC) ---
+        // A. Build Query to find recipients
+        $sql = "SELECT Email, FirstName, LastName FROM StudentDetails WHERE 1=1";
+        $params = [];
+        
+        if ($target_schol != 'all') {
+            $sql .= " AND Scholarship LIKE ?";
+            $params[] = '%' . $target_schol . '%';
+        }
+        if ($target_status != 'all') {
+            $sql .= " AND Status = ?";
+            $params[] = $target_status;
+        }
+
+        write_log("SQL Query: " . $sql);
+        write_log("Parameters: " . print_r($params, true));
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->execute($params);
+        $recipients = $stmt->fetchAll();
+        
+        write_log("Recipients Found: " . count($recipients));
+
+        $count = count($recipients);
+        $sent_count = 0;
+        
+        // B. Start Email Sending Process
+        if ($count > 0) {
+            $mail = new PHPMailer(true);
+
+            try {
+                // --- SERVER SETTINGS (GMAIL) ---
+                $mail->isSMTP();                                            
+                $mail->Host       = 'smtp.gmail.com';                     
+                $mail->SMTPAuth   = true;                                   
+                
+                // =================================================================
+                // 🛑 YOU MUST EDIT THESE TWO LINES FOR IT TO WORK 🛑
+                // =================================================================
+                $mail->Username   = 'societyscholars3@gmail.com';         // <--- PUT YOUR REAL GMAIL HERE
+                $mail->Password   = 'wznztwaofzqwrwqf';          // <--- PUT YOUR 16-CHAR APP PASSWORD HERE
+                // =================================================================
+                
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            
+                $mail->Port       = 587;                                    
+
+                // --- SENDER INFO ---
+                $mail->setFrom($mail->Username, 'LSS Admin'); // Uses your email as the "From" address
+
+                // --- CONTENT SETTINGS ---
+                $mail->isHTML(true);                                  
+                $mail->Subject = $subject_line;
+
+                // --- LOOP THROUGH STUDENTS ---
+                foreach($recipients as $student) {
+                    try {
+                        // 1. Add Recipient
+                        $mail->addAddress($student['Email'], $student['FirstName']); 
+
+                        // 2. Personalize Message (Replace {name} with actual First Name)
+                        $personalized_body = str_replace('{name}', $student['FirstName'], $body_content);
+                        $mail->Body = $personalized_body;
+
+                        // 3. Send
+                        $mail->send();
+                        $sent_count++;
+
+                        // 4. CLEAR ADDRESS (Critical for Loops!)
+                        $mail->clearAddresses();
+                        
+                    } catch (Exception $e) {
+                        // If one email fails, log the error and continue to the next
+                        $debug_log .= "Failed to send to " . $student['Email'] . ": " . $mail->ErrorInfo . "<br>";
+                        $mail->getSMTPInstance()->reset(); // Reset connection to try next one
+                        $mail->clearAddresses();
+                        continue; 
+                    }
+                }
+                
+                if ($sent_count == 0) {
+                    $message_status = "<span style='color:red;'>Failed. 0 emails sent. See debug log below.</span>";
+                } else {
+                    $message_status = "<span style='color:green;'>Success! Blast email sent to <strong>$sent_count</strong> out of <strong>$count</strong> scholars.</span>";
+                }
+
+            } catch (Exception $e) {
+                $message_status = "<span style='color:red;'>Critical Mailer Error: {" . $mail->ErrorInfo . "}</span>";
+            }
+        } else {
+            $message_status = "<span style='color:orange;'>No scholars found matching those filters.</span>";
+        }
     }
 }
 
@@ -238,10 +277,40 @@ $scholarship_options = [
             <label>Message Body</label>
             <textarea name="message" rows="8" required placeholder="Type your announcement here... You can use {name} to insert the student's name automatically."></textarea>
 
-            <button type="submit" class="btn">Send Blast Email</button>
+            <div style="margin-bottom: 15px;">
+                <label for="schedule_email_checkbox">
+                    <input type="checkbox" id="schedule_email_checkbox" name="schedule_email" value="1" style="width: auto;">
+                    Schedule for Later?
+                </label>
+            </div>
+
+            <div id="schedule_time_div" style="display: none; margin-bottom: 15px;">
+                <label>Schedule Time (Date and Time)</label>
+                <input type="datetime-local" name="schedule_time">
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">Send Blast Email</button>
         </form>
     </div>
 </main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const scheduleCheckbox = document.getElementById('schedule_email_checkbox');
+        const scheduleTimeDiv = document.getElementById('schedule_time_div');
+        const submitBtn = document.getElementById('submitBtn');
+
+        scheduleCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                scheduleTimeDiv.style.display = 'block';
+                submitBtn.textContent = 'Schedule Email';
+            } else {
+                scheduleTimeDiv.style.display = 'none';
+                submitBtn.textContent = 'Send Blast Email';
+            }
+        });
+    });
+</script>
 
 </body>
 </html>
