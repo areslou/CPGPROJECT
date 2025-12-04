@@ -70,6 +70,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     }
 }
 
+// --- HANDLE SUBMISSION PICTURE UPLOAD ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['submitted_image'])) {
+    $target_dir = "uploads/";
+    $imageFileType = strtolower(pathinfo($_FILES["submitted_image"]["name"], PATHINFO_EXTENSION));
+    $new_filename = $student_number . '_submitted_' . time() . '.' . $imageFileType;
+    $target_file = $target_dir . $new_filename;
+
+    // Check if file is an image
+    $check = getimagesize($_FILES["submitted_image"]["tmp_name"]);
+    if($check !== false) {
+        // Allow only certain file types
+        if(!in_array($imageFileType, ["jpg","jpeg","png","gif","pdf"])) { // added pdf if needed
+            $message = "❌ Only JPG, JPEG, PNG, GIF or PDF files are allowed.";
+            $message_type = "error";
+        } else {
+            if(move_uploaded_file($_FILES["submitted_image"]["tmp_name"], $target_file)) {
+                // Save filename to database (optional)
+                try {
+                    $stmt = $conn->prepare("UPDATE StudentDetails SET SubmissionProof = ? WHERE StudentNumber = ?");
+                    $stmt->execute([$new_filename, $student_number]);
+                    $message = "✅ File submitted successfully.";
+                    $message_type = "success";
+                } catch(PDOException $e) {
+                    $message = "❌ Error updating database: " . $e->getMessage();
+                    $message_type = "error";
+                }
+            } else {
+                $message = "❌ Error uploading your file.";
+                $message_type = "error";
+            }
+        }
+    } else {
+        $message = "❌ The file is not a valid image.";
+        $message_type = "error";
+    }
+}
 
 
 // --- 2. FETCH STUDENT DETAILS ---
