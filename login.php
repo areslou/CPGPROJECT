@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             /* CHANGE THIS LINE TO YOUR LOCAL FILE NAME */
-            background: url('Main%20Page%20Background.gif') no-repeat center center fixed; 
+            background: url('Main Page Background.gif') no-repeat center center fixed; 
             background-size: cover;
             display: flex; 
             align-items: center; 
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             backdrop-filter: blur(5px); /* Nice blur effect behind card */
         }
 
-        h1 { color: black; margin-bottom: 0.5rem; font-size: 2rem; }
+        h1 { color: #00A36C; margin-bottom: 0.5rem; font-size: 2rem; }
         .subtitle { color: #555; margin-bottom: 2rem; font-size: 0.95rem; }
         
         .form-group { margin-bottom: 1.25rem; text-align: left; }
