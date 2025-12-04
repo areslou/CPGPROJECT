@@ -48,23 +48,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
 
 
 // --- 1. HANDLE CONTACT NUMBER UPDATE ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_contact'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
+
     $new_contact = trim($_POST['contact_number']);
-    
-    // Basic validation
-    if (!empty($new_contact)) {
-        try {
-            $stmt = $conn->prepare("UPDATE StudentDetails SET ContactNumber = ? WHERE StudentNumber = ?");
-            $stmt->execute([$new_contact, $student_number]);
-            $message = "✅ Contact information updated successfully.";
-            $message_type = "success";
-        } catch (PDOException $e) {
-            $message = "❌ Error updating record: " . $e->getMessage();
-            $message_type = "error";
-        }
-    } else {
-        $message = "⚠️ Contact number cannot be empty.";
-        $message_type = "error";
+    $new_email   = trim($_POST['email']);
+    $new_degree  = trim($_POST['degree']);
+
+    try {
+        $stmt = $conn->prepare("
+            UPDATE StudentDetails 
+            SET ContactNumber = ?, Email = ?, DegreeProgram = ?
+            WHERE StudentNumber = ?
+        ");
+        $stmt->execute([$new_contact, $new_email, $new_degree, $student_number]);   
+
+        $message = "✅ Profile updated successfully!";
+    } catch (PDOException $e) {
+        $message = "❌ Error updating record.";
     }
 }
 
