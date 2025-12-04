@@ -1,17 +1,43 @@
 <?php
 // admin_email_blast.php
+
+// --------------------------------------------------------------------------
+// 1. SETUP PHPMAILER (Manual Method)
+// --------------------------------------------------------------------------
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
+
+// Load the PHPMailer files from the folder you created
+require 'PHPMailer/Exception.php';
+require 'PHPMailer/PHPMailer.php';
+require 'PHPMailer/SMTP.php';
+
+// --------------------------------------------------------------------------
+// 2. STANDARD PAGE SETUP
+// --------------------------------------------------------------------------
 require_once 'auth_check.php';
 requireAdmin();
 require_once 'config.php';
 
-$message_status = "";
+// Increase timeout limit to 5 minutes (sending emails takes time)
+set_time_limit(300); 
 
+$message_status = "";
+$debug_log = ""; // Variable to store specific error messages
+
+// --------------------------------------------------------------------------
+// 3. HANDLE FORM SUBMISSION
+// --------------------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $target_schol = $_POST['target_scholarship'];
     $target_status = $_POST['target_status'];
+    $subject_line = $_POST['subject'];
+    $body_content = $_POST['message'];
     
-    // 1. Build Query to find recipients
-    $sql = "SELECT Email, FirstName FROM StudentDetails WHERE 1=1";
+    // A. Build Query to find recipients
+    // This logic ensures we only get students from the selected group
+    $sql = "SELECT Email, FirstName, LastName FROM StudentDetails WHERE 1=1";
     $params = [];
     
     if ($target_schol != 'all') {
@@ -28,11 +54,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $recipients = $stmt->fetchAll();
     
     $count = count($recipients);
+    $sent_count = 0;
     
-    // 2. In a real app, you would loop here and use mail()
-    // foreach($recipients as $r) { mail($r['Email'], ...); }
-    
-    $message_status = "Success! Blast email queued for <strong>$count</strong> scholars.";
+    // B. Start Email Sending Process
+    if ($count > 0) {
+        $mail = new PHPMailer(true);
+
+        try {
+            // --- SERVER SETTINGS (GMAIL) ---
+            $mail->isSMTP();                                            
+            $mail->Host       = 'smtp.gmail.com';                     
+            $mail->SMTPAuth   = true;                                   
+            
+            // =================================================================
+            // 🛑 YOU MUST EDIT THESE TWO LINES FOR IT TO WORK 🛑
+            // =================================================================
+            $mail->Username   = 'societyscholars3@gmail.com';         // <--- PUT YOUR REAL GMAIL HERE
+            $mail->Password   = 'wznztwaofzqwrwqf';          // <--- PUT YOUR 16-CHAR APP PASSWORD HERE
+            // =================================================================
+            
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            
+            $mail->Port       = 587;                                    
+
+            // --- SENDER INFO ---
+            $mail->setFrom($mail->Username, 'LSS Admin'); // Uses your email as the "From" address
+
+            // --- CONTENT SETTINGS ---
+            $mail->isHTML(true);                                  
+            $mail->Subject = $subject_line;
+
+            // --- LOOP THROUGH STUDENTS ---
+            foreach($recipients as $student) {
+                try {
+                    // 1. Add Recipient
+                    $mail->addAddress($student['Email'], $student['FirstName']); 
+
+                    // 2. Personalize Message (Replace {name} with actual First Name)
+                    $personalized_body = str_replace('{name}', $student['FirstName'], $body_content);
+                    $mail->Body = $personalized_body;
+
+                    // 3. Send
+                    $mail->send();
+                    $sent_count++;
+
+                    // 4. CLEAR ADDRESS (Critical for Loops!)
+                    $mail->clearAddresses();
+                    
+                } catch (Exception $e) {
+                    // If one email fails, log the error and continue to the next
+                    $debug_log .= "Failed to send to " . $student['Email'] . ": " . $mail->ErrorInfo . "<br>";
+                    $mail->getSMTPInstance()->reset(); // Reset connection to try next one
+                    $mail->clearAddresses();
+                    continue; 
+                }
+            }
+            
+            if ($sent_count == 0) {
+                $message_status = "<span style='color:red;'>Failed. 0 emails sent. See debug log below.</span>";
+            } else {
+                $message_status = "<span style='color:green;'>Success! Blast email sent to <strong>$sent_count</strong> out of <strong>$count</strong> scholars.</span>";
+            }
+
+        } catch (Exception $e) {
+            $message_status = "<span style='color:red;'>Critical Mailer Error: {$mail->ErrorInfo}</span>";
+        }
+    } else {
+        $message_status = "<span style='color:orange;'>No scholars found matching those filters.</span>";
+    }
 }
 
 // Get scholarships for dropdown
@@ -82,6 +170,9 @@ $scholarship_options = [
         .btn { background: #00A36C; color: #fcf9f4; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; }
         .btn-secondary { background: #6c757d; width: auto; font-size: 14px; text-decoration: none; display: inline-block; padding: 8px 15px; border-radius: 5px; color: #fcf9f4; }
         .alert { padding: 15px; background: #d4edda; color: #155724; border-radius: 5px; margin-bottom: 20px; }
+        
+        /* New Debug Log Style */
+        .debug-box { background: #fff3cd; color: #856404; padding: 15px; border: 1px solid #ffeeba; margin-bottom: 20px; border-radius: 5px; font-family: monospace; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -107,6 +198,14 @@ $scholarship_options = [
 
     <?php if($message_status): ?>
         <div class="alert"><?php echo $message_status; ?></div>
+    <?php endif; ?>
+
+    <!-- SHOW ERRORS HERE IF ANY -->
+    <?php if($debug_log): ?>
+        <div class="debug-box">
+            <strong>Debug Log (Show this to developer):</strong><br>
+            <?php echo $debug_log; ?>
+        </div>
     <?php endif; ?>
 
     <div class="card">
@@ -137,7 +236,7 @@ $scholarship_options = [
             <input type="text" name="subject" placeholder="e.g. [REMINDER] Renewal Deadline" required>
 
             <label>Message Body</label>
-            <textarea name="message" rows="8" required placeholder="Type your announcement here..."></textarea>
+            <textarea name="message" rows="8" required placeholder="Type your announcement here... You can use {name} to insert the student's name automatically."></textarea>
 
             <button type="submit" class="btn">Send Blast Email</button>
         </form>
