@@ -83,7 +83,14 @@ if (!$me) {
 
     <div class="container">
         <div class="card">
-            <div class="profile-pic">👤</div>
+            <div class="profile-pic">
+                <?php if (!empty($me['ProfilePic'])): ?>
+                    <img src="uploads/profile/<?php echo htmlspecialchars($me['ProfilePic']); ?>" 
+                        style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+                <?php else: ?>
+                    🎓
+                <?php endif; ?>
+            </div>
             <div class="student-name"><?php echo htmlspecialchars($me['FirstName'] . ' ' . $me['LastName']); ?></div>
             <div class="student-id">ID: <?php echo htmlspecialchars($me['StudentNumber']); ?></div>
             
