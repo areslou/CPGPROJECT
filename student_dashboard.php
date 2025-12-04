@@ -46,27 +46,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
     }
 }
 
+// --- 1. HANDLE PROFILE INFO UPDATE ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
 
-// --- 1. HANDLE CONTACT NUMBER UPDATE ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_contact'])) {
     $new_contact = trim($_POST['contact_number']);
-    
-    // Basic validation
-    if (!empty($new_contact)) {
-        try {
-            $stmt = $conn->prepare("UPDATE StudentDetails SET ContactNumber = ? WHERE StudentNumber = ?");
-            $stmt->execute([$new_contact, $student_number]);
-            $message = "✅ Contact information updated successfully.";
-            $message_type = "success";
-        } catch (PDOException $e) {
-            $message = "❌ Error updating record: " . $e->getMessage();
-            $message_type = "error";
-        }
-    } else {
-        $message = "⚠️ Contact number cannot be empty.";
+    $new_email   = trim($_POST['email']);
+    $new_degree  = trim($_POST['degree']);
+    $new_scholarship = trim($_POST['scholarship']); // <-- added
+
+    try {
+        $stmt = $conn->prepare("
+            UPDATE StudentDetails 
+            SET ContactNumber = ?, Email = ?, DegreeProgram = ?, Scholarship = ?
+            WHERE StudentNumber = ?
+        ");
+        $stmt->execute([$new_contact, $new_email, $new_degree, $new_scholarship, $student_number]); // <-- added
+
+        $message = "✅ Profile updated successfully!";
+        $message_type = "success";
+    } catch (PDOException $e) {
+        $message = "❌ Error updating record.";
         $message_type = "error";
     }
 }
+
+// --- HANDLE SUBMISSION PICTURE UPLOAD ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['submitted_image'])) {
+    $target_dir = "uploads/";
+    $imageFileType = strtolower(pathinfo($_FILES["submitted_image"]["name"], PATHINFO_EXTENSION));
+    $new_filename = $student_number . '_submitted_' . time() . '.' . $imageFileType;
+    $target_file = $target_dir . $new_filename;
+
+    // Check if file is an image
+    $check = getimagesize($_FILES["submitted_image"]["tmp_name"]);
+    if($check !== false) {
+        // Allow only certain file types
+        if(!in_array($imageFileType, ["jpg","jpeg","png","gif","pdf"])) { // added pdf if needed
+            $message = "❌ Only JPG, JPEG, PNG, GIF or PDF files are allowed.";
+            $message_type = "error";
+        } else {
+            if(move_uploaded_file($_FILES["submitted_image"]["tmp_name"], $target_file)) {
+                // Save filename to database (optional)
+                try {
+                    $stmt = $conn->prepare("UPDATE StudentDetails SET SubmissionProof = ? WHERE StudentNumber = ?");
+                    $stmt->execute([$new_filename, $student_number]);
+                    $message = "✅ File submitted successfully.";
+                    $message_type = "success";
+                } catch(PDOException $e) {
+                    $message = "❌ Error updating database: " . $e->getMessage();
+                    $message_type = "error";
+                }
+            } else {
+                $message = "❌ Error uploading your file.";
+                $message_type = "error";
+            }
+        }
+    } else {
+        $message = "❌ The file is not a valid image.";
+        $message_type = "error";
+    }
+}
+
 
 // --- 2. FETCH STUDENT DETAILS ---
 try {
@@ -210,6 +250,8 @@ $requirements = [
         .alert-success { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
         .alert-error { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
 
+        .edit-form { display: none; } /* Hidden by default */
+
         @media (max-width: 768px) {
             .container { grid-template-columns: 1fr; }
         }
@@ -242,6 +284,7 @@ $requirements = [
                     <?= htmlspecialchars($student['FirstName'] . ' ' . $student['LastName']) ?>
                 </div>
                 <div class="student-id"><?= htmlspecialchars($student['StudentNumber']) ?></div>
+                <button id="editProfileBtn" class="btn-submit" style="margin-top: 1rem;">Edit Profile</button>
                 
                 <span class="status-badge status-<?= str_replace(' ', '-', $student['Status']) ?>">
                     <?= htmlspecialchars($student['Status']) ?>
@@ -276,14 +319,28 @@ $requirements = [
                         <div class="alert alert-<?= $message_type ?>"><?= $message ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST">
-                        <label class="form-label">Contact Number (Editable)</label>
-                        <div class="input-group">
-                            <input type="text" name="contact_number" class="form-input" 
-                                   value="<?= htmlspecialchars($student['ContactNumber']) ?>" 
-                                   placeholder="09xxxxxxxxx">
-                            <button type="submit" name="update_contact" class="btn-submit">Save</button>
-                        </div>
+                    <form method="POST" enctype="multipart/form-data">
+                        <!-- Degree Program -->
+                        <label class="form-label" style="margin-top:10px;">Degree Program</label>
+                        <input type="text" name="degree" class="form-input"
+                            value="<?= htmlspecialchars($student['DegreeProgram']) ?>"
+                            placeholder="BS Computer Science">
+
+                        <!-- Email -->
+                        <label class="form-label" style="margin-top:10px;">Email</label>
+                        <input type="email" name="email" class="form-input"
+                            value="<?= htmlspecialchars($student['Email']) ?>" 
+                            placeholder="example@dlsu.edu.ph">
+
+                        <!-- Contact Number -->
+                        <label class="form-label" style="margin-top:10px;">Contact Number</label>
+                        <input type="text" name="contact_number" class="form-input"
+                            value="<?= htmlspecialchars($student['ContactNumber']) ?>" 
+                            placeholder="09xxxxxxxxx">
+
+                        <button type="submit" name="update_profile" class="btn-submit" style="margin-top:10px;">
+                            Save Changes
+                        </button>
                     </form>
                 </div>
 
@@ -305,6 +362,21 @@ $requirements = [
                     Please ensure all requirements are submitted before the deadlines below to maintain your scholarship status.
                 </p>
             </div>
+            <div class="edit-form">
+                    <?php if($message): ?>
+                        <div class="alert alert-<?= $message_type ?>"><?= $message ?></div>
+                    <?php endif; ?>
+                    <form method="POST" enctype="multipart/form-data"></form>
+                        <!-- Scholarship Type -->
+                        <label class="form-label" style="margin-top:10px;">Scholarship</label>
+                        <input type="text" name="scholarship" class="form-input"
+                            value="<?= htmlspecialchars($student['Scholarship']) ?>"
+                            placeholder="e.g., Academic Excellence Scholarship">
+                        <button type="submit" name="update_profile" class="btn-submit" style="margin-top:10px;">
+                            Save Changes
+                        </button>
+                    </form>
+             </div>
         </div>
 
         <!-- TASK TRACKER (REQUIREMENTS) -->
@@ -334,10 +406,68 @@ $requirements = [
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            <div class="edit-form">
+                    <form action="student_dashboard.php" method="post" enctype="multipart/form-data">
+                        <label class="form-label">Submit Proof of Requirement Submission</label>
+                        <div class="input-group">
+                            <input type="file" name="requirement" class="form-input">
+                            <button type="submit" name="update_requirement" class="btn-submit">Upload</button>
+                        </div>
+                    </form>
+                </div>
         </div>
     </main>
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const editForms = document.querySelectorAll('.edit-form');
+
+        // Function to toggle visibility of edit forms
+        function toggleEditForms() {
+            editForms.forEach(form => {
+                form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
+            });
+            // Optionally, change button text
+            if (editProfileBtn.textContent === 'Edit Profile') {
+                editProfileBtn.textContent = 'Hide Edit Forms';
+            } else {
+                editProfileBtn.textContent = 'Edit Profile';
+            }
+        }
+
+        // Event listener for the Edit Profile button
+        if (editProfileBtn) {
+            editProfileBtn.addEventListener('click', toggleEditForms);
+        }
+
+        // Add a cancel button to each form
+        editForms.forEach(form => {
+            const cancelButton = document.createElement('button');
+            cancelButton.type = 'button';
+            cancelButton.textContent = 'Cancel';
+            cancelButton.classList.add('btn-submit'); // Use existing style
+            cancelButton.style.marginTop = '10px';
+            cancelButton.style.marginLeft = '10px'; // Add some spacing
+
+            cancelButton.addEventListener('click', toggleEditForms); // Re-use toggle function
+
+            // Append cancel button to each form
+            // Find the last form element (e.g., the submit button) and insert before it
+            const formElement = form.querySelector('form');
+            if (formElement) {
+                const submitButton = formElement.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.parentNode.insertBefore(cancelButton, submitButton.nextSibling);
+                } else {
+                    formElement.appendChild(cancelButton); // If no submit button, just append
+                }
+            }
+        });
+    });
+</script>
 
 </body>
 </html>
