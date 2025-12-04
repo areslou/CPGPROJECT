@@ -47,26 +47,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
 }
 
 
-// --- 1. HANDLE CONTACT NUMBER UPDATE ---
+// --- 1. HANDLE PROFILE INFO UPDATE ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
 
     $new_contact = trim($_POST['contact_number']);
     $new_email   = trim($_POST['email']);
     $new_degree  = trim($_POST['degree']);
+    $new_scholarship = trim($_POST['scholarship']); // <-- added
 
     try {
         $stmt = $conn->prepare("
             UPDATE StudentDetails 
-            SET ContactNumber = ?, Email = ?, DegreeProgram = ?
+            SET ContactNumber = ?, Email = ?, DegreeProgram = ?, Scholarship = ?
             WHERE StudentNumber = ?
         ");
-        $stmt->execute([$new_contact, $new_email, $new_degree, $student_number]);   
+        $stmt->execute([$new_contact, $new_email, $new_degree, $new_scholarship, $student_number]); // <-- added
 
         $message = "✅ Profile updated successfully!";
+        $message_type = "success";
     } catch (PDOException $e) {
         $message = "❌ Error updating record.";
+        $message_type = "error";
     }
 }
+
+
 
 // --- 2. FETCH STUDENT DETAILS ---
 try {
@@ -276,7 +281,7 @@ $requirements = [
                         <div class="alert alert-<?= $message_type ?>"><?= $message ?></div>
                     <?php endif; ?>
                     
-                     <form method="POST" enctype="multipart/form-data">
+                    <form method="POST" enctype="multipart/form-data">
                         <!-- Degree Program -->
                         <label class="form-label" style="margin-top:10px;">Degree Program</label>
                         <input type="text" name="degree" class="form-input"
@@ -288,6 +293,12 @@ $requirements = [
                         <input type="email" name="email" class="form-input"
                             value="<?= htmlspecialchars($student['Email']) ?>" 
                             placeholder="example@dlsu.edu.ph">
+                        
+                        <!-- Scholarship Type -->
+                        <label class="form-label" style="margin-top:10px;">Scholarship</label>
+                        <input type="text" name="scholarship" class="form-input"
+                            value="<?= htmlspecialchars($student['Scholarship']) ?>"
+                            placeholder="e.g., Academic Excellence Scholarship">
 
                         <!-- Contact Number -->
                         <label class="form-label" style="margin-top:10px;">Contact Number</label>
