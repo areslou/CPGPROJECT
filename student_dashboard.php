@@ -276,14 +276,32 @@ $requirements = [
                         <div class="alert alert-<?= $message_type ?>"><?= $message ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST">
-                        <label class="form-label">Contact Number (Editable)</label>
-                        <div class="input-group">
-                            <input type="text" name="contact_number" class="form-input" 
-                                   value="<?= htmlspecialchars($student['ContactNumber']) ?>" 
-                                   placeholder="09xxxxxxxxx">
-                            <button type="submit" name="update_contact" class="btn-submit">Save</button>
-                        </div>
+                    <form method="POST" enctype="multipart/form-data">
+                        <!-- Profile Picture -->
+                        <label class="form-label">Profile Picture</label>
+                        <input type="file" name="profile_pic" class="form-input">
+
+                        <!-- Contact Number -->
+                        <label class="form-label" style="margin-top:10px;">Contact Number</label>
+                        <input type="text" name="contact_number" class="form-input"
+                            value="<?= htmlspecialchars($student['ContactNumber']) ?>" 
+                            placeholder="09xxxxxxxxx">
+
+                        <!-- Email -->
+                        <label class="form-label" style="margin-top:10px;">Email</label>
+                        <input type="email" name="email" class="form-input"
+                            value="<?= htmlspecialchars($student['Email']) ?>" 
+                            placeholder="example@dlsu.edu.ph">
+
+                        <!-- Degree Program -->
+                        <label class="form-label" style="margin-top:10px;">Degree Program</label>
+                        <input type="text" name="degree" class="form-input"
+                            value="<?= htmlspecialchars($student['DegreeProgram']) ?>"
+                            placeholder="BS Computer Science">
+
+                        <button type="submit" name="update_profile" class="btn-submit" style="margin-top:10px;">
+                            Save Changes
+                        </button>
                     </form>
                 </div>
 
