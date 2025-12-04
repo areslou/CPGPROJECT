@@ -276,16 +276,12 @@ $requirements = [
                         <div class="alert alert-<?= $message_type ?>"><?= $message ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST" enctype="multipart/form-data">
-                        <!-- Profile Picture -->
-                        <label class="form-label">Profile Picture</label>
-                        <input type="file" name="profile_pic" class="form-input">
-
-                        <!-- Contact Number -->
-                        <label class="form-label" style="margin-top:10px;">Contact Number</label>
-                        <input type="text" name="contact_number" class="form-input"
-                            value="<?= htmlspecialchars($student['ContactNumber']) ?>" 
-                            placeholder="09xxxxxxxxx">
+                     <form method="POST" enctype="multipart/form-data">
+                        <!-- Degree Program -->
+                        <label class="form-label" style="margin-top:10px;">Degree Program</label>
+                        <input type="text" name="degree" class="form-input"
+                            value="<?= htmlspecialchars($student['DegreeProgram']) ?>"
+                            placeholder="BS Computer Science">
 
                         <!-- Email -->
                         <label class="form-label" style="margin-top:10px;">Email</label>
@@ -293,11 +289,11 @@ $requirements = [
                             value="<?= htmlspecialchars($student['Email']) ?>" 
                             placeholder="example@dlsu.edu.ph">
 
-                        <!-- Degree Program -->
-                        <label class="form-label" style="margin-top:10px;">Degree Program</label>
-                        <input type="text" name="degree" class="form-input"
-                            value="<?= htmlspecialchars($student['DegreeProgram']) ?>"
-                            placeholder="BS Computer Science">
+                        <!-- Contact Number -->
+                        <label class="form-label" style="margin-top:10px;">Contact Number</label>
+                        <input type="text" name="contact_number" class="form-input"
+                            value="<?= htmlspecialchars($student['ContactNumber']) ?>" 
+                            placeholder="09xxxxxxxxx">
 
                         <button type="submit" name="update_profile" class="btn-submit" style="margin-top:10px;">
                             Save Changes
