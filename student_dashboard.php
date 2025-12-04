@@ -46,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
     }
 }
 
-
 // --- 1. HANDLE PROFILE INFO UPDATE ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
 
@@ -293,12 +292,6 @@ $requirements = [
                         <input type="email" name="email" class="form-input"
                             value="<?= htmlspecialchars($student['Email']) ?>" 
                             placeholder="example@dlsu.edu.ph">
-                        
-                        <!-- Scholarship Type -->
-                        <label class="form-label" style="margin-top:10px;">Scholarship</label>
-                        <input type="text" name="scholarship" class="form-input"
-                            value="<?= htmlspecialchars($student['Scholarship']) ?>"
-                            placeholder="e.g., Academic Excellence Scholarship">
 
                         <!-- Contact Number -->
                         <label class="form-label" style="margin-top:10px;">Contact Number</label>
@@ -330,6 +323,21 @@ $requirements = [
                     Please ensure all requirements are submitted before the deadlines below to maintain your scholarship status.
                 </p>
             </div>
+            <div class="edit-form">
+                    <?php if($message): ?>
+                        <div class="alert alert-<?= $message_type ?>"><?= $message ?></div>
+                    <?php endif; ?>
+                    <form method="POST" enctype="multipart/form-data"></form>
+                        <!-- Scholarship Type -->
+                        <label class="form-label" style="margin-top:10px;">Scholarship</label>
+                        <input type="text" name="scholarship" class="form-input"
+                            value="<?= htmlspecialchars($student['Scholarship']) ?>"
+                            placeholder="e.g., Academic Excellence Scholarship">
+                        <button type="submit" name="update_profile" class="btn-submit" style="margin-top:10px;">
+                            Save Changes
+                        </button>
+                    </form>
+             </div>
         </div>
 
         <!-- TASK TRACKER (REQUIREMENTS) -->
@@ -359,6 +367,15 @@ $requirements = [
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            <div class="edit-form">
+                    <form action="student_dashboard.php" method="post" enctype="multipart/form-data">
+                        <label class="form-label">Submit Proof of Requirement Submission</label>
+                        <div class="input-group">
+                            <input type="file" name="requirement" class="form-input">
+                            <button type="submit" name="update_requirement" class="btn-submit">Upload</button>
+                        </div>
+                    </form>
+                </div>
         </div>
     </main>
 
