@@ -14,29 +14,62 @@ if (isset($_GET['delete'])) {
 
 // --- HANDLE CREATE/UPDATE ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_scholar'])) {
-    $s_num = $_POST['StudentNumber'];
-    $lname = $_POST['LastName'];
-    $fname = $_POST['FirstName'];
-    $mname = $_POST['MiddleName'];
-    $degree = $_POST['DegreeProgram'];
-    $email = $_POST['Email'];
-    $schol = $_POST['Scholarship'];
+    $s_num = trim($_POST['StudentNumber']);
+    $lname = strtoupper(trim($_POST['LastName'])); // AUTO CONVERT TO UPPERCASE
+    $fname = trim($_POST['FirstName']);
+    $mname = trim($_POST['MiddleName']);
+    $degree = trim($_POST['DegreeProgram']);
+    $email = trim($_POST['Email']);
+    $schol = trim($_POST['Scholarship']);
     $status = $_POST['Status'];
-    $contact = $_POST['ContactNumber'];
+    $contact = trim($_POST['ContactNumber']);
 
-    $check = $conn->prepare("SELECT StudentNumber FROM StudentDetails WHERE StudentNumber = ?");
-    $check->execute([$s_num]);
+    // SERVER-SIDE VALIDATION
+    $errors = [];
     
-    if ($check->rowCount() > 0 && $_POST['is_edit'] == '1') {
-        // Update
-        $sql = "UPDATE StudentDetails SET LastName=?, FirstName=?, MiddleName=?, DegreeProgram=?, Email=?, Scholarship=?, Status=?, ContactNumber=? WHERE StudentNumber=?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$lname, $fname, $mname, $degree, $email, $schol, $status, $contact, $s_num]);
-    } else {
-        // Insert
-        $sql = "INSERT INTO StudentDetails (StudentNumber, LastName, FirstName, MiddleName, DegreeProgram, Email, Scholarship, Status, ContactNumber) VALUES (?,?,?,?,?,?,?,?,?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$s_num, $lname, $fname, $mname, $degree, $email, $schol, $status, $contact]);
+    // Validate ID Number - must be exactly 8 digits
+    if (!preg_match('/^\d{8}$/', $s_num)) {
+        $errors[] = "ID Number must be exactly 8 digits.";
+    }
+    
+    // Check for duplicate ID Number (only for new entries, not edits)
+    if ($_POST['is_edit'] == '0') {
+        $checkDuplicate = $conn->prepare("SELECT COUNT(*) FROM StudentDetails WHERE StudentNumber = ?");
+        $checkDuplicate->execute([$s_num]);
+        if ($checkDuplicate->fetchColumn() > 0) {
+            $errors[] = "ID Number already exists in the database. Please use a different ID Number.";
+        }
+    }
+    
+    // Validate Contact Number - must be exactly 11 digits
+    if (!empty($contact) && !preg_match('/^\d{11}$/', $contact)) {
+        $errors[] = "Contact Number must be exactly 11 digits.";
+    }
+    
+    // Validate DLSU Email format
+    if (!preg_match('/^[a-zA-Z0-9._-]+@dlsu\.edu\.ph$/', $email)) {
+        $errors[] = "Email must be in format: username@dlsu.edu.ph";
+    }
+    
+    if (empty($errors)) {
+        $check = $conn->prepare("SELECT StudentNumber FROM StudentDetails WHERE StudentNumber = ?");
+        $check->execute([$s_num]);
+        
+        if ($check->rowCount() > 0 && $_POST['is_edit'] == '1') {
+            // Update
+            $sql = "UPDATE StudentDetails SET LastName=?, FirstName=?, MiddleName=?, DegreeProgram=?, Email=?, Scholarship=?, Status=?, ContactNumber=? WHERE StudentNumber=?";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$lname, $fname, $mname, $degree, $email, $schol, $status, $contact, $s_num]);
+            header("Location: admin_scholars.php?msg=updated");
+            exit();
+        } else {
+            // Insert
+            $sql = "INSERT INTO StudentDetails (StudentNumber, LastName, FirstName, MiddleName, DegreeProgram, Email, Scholarship, Status, ContactNumber) VALUES (?,?,?,?,?,?,?,?,?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$s_num, $lname, $fname, $mname, $degree, $email, $schol, $status, $contact]);
+            header("Location: admin_scholars.php?msg=added");
+            exit();
+        }
     }
 }
 
@@ -68,6 +101,10 @@ $sql .= " ORDER BY LastName ASC";
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $scholars = $stmt->fetchAll();
+
+// Get all existing ID Numbers for client-side validation
+$existing_ids_stmt = $conn->query("SELECT StudentNumber FROM StudentDetails");
+$existing_ids = $existing_ids_stmt->fetchAll(PDO::FETCH_COLUMN);
 
 $scholarship_options = [
     'St. La Salle Financial Assistance Grant',
@@ -163,6 +200,40 @@ $scholarship_options = [
             margin-top: 2rem;
             text-align: right;
         }
+        
+        /* VALIDATION STYLES */
+        .error-message { 
+            color: #e74c3c; 
+            font-size: 1.1rem; 
+            margin-top: 0.5rem; 
+            display: none; 
+        }
+        .error-message.show { display: block; }
+        .input-error { border-color: #e74c3c !important; }
+        .hint { 
+            font-size: 1.1rem; 
+            color: #666; 
+            margin-top: 0.3rem; 
+            font-style: italic; 
+        }
+        
+        /* Alert Messages */
+        .alert {
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 0.1rem solid #c3e6cb;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 0.1rem solid #f5c6cb;
+        }
     </style>
 </head>
 <body>
@@ -189,6 +260,25 @@ $scholarship_options = [
     </div>
 
     <div class="content-card">
+        <?php if(isset($_GET['msg'])): ?>
+            <div class="alert alert-success">
+                <?php 
+                    if($_GET['msg'] == 'added') echo '✓ Scholar added successfully!';
+                    if($_GET['msg'] == 'updated') echo '✓ Scholar updated successfully!';
+                    if($_GET['msg'] == 'deleted') echo '✓ Scholar deleted successfully!';
+                ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if(isset($errors) && !empty($errors)): ?>
+            <div class="alert alert-error">
+                <strong>Validation Errors:</strong><br>
+                <?php foreach($errors as $error): ?>
+                    • <?php echo htmlspecialchars($error); ?><br>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        
         <form class="filter-bar" method="GET">
             <input type="text" name="search" placeholder="Search Name or ID..." value="<?php echo $_GET['search'] ?? ''; ?>">
             
@@ -253,19 +343,23 @@ $scholarship_options = [
 <div id="scholarModal" class="modal">
     <div class="modal-content">
         <h2 id="modalTitle">Add Scholar</h2>
-        <form method="POST">
+        <form method="POST" id="scholarForm">
             <input type="hidden" name="is_edit" id="is_edit" value="0">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>ID Number</label>
-                    <input type="number" name="StudentNumber" id="StudentNumber" required>
+                    <label>ID Number *</label>
+                    <input type="text" name="StudentNumber" id="StudentNumber" maxlength="8" required>
+                    <div class="hint">Must be exactly 8 digits and unique</div>
+                    <div class="error-message" id="error_id">ID Number must be exactly 8 digits</div>
+                    <div class="error-message" id="error_duplicate">This ID Number already exists</div>
                 </div>
                 <div class="form-group">
-                    <label>Last Name</label>
+                    <label>Last Name *</label>
                     <input type="text" name="LastName" id="LastName" required>
+                    <div class="hint">Will be auto-converted to UPPERCASE</div>
                 </div>
                 <div class="form-group">
-                    <label>First Name</label>
+                    <label>First Name *</label>
                     <input type="text" name="FirstName" id="FirstName" required>
                 </div>
                 <div class="form-group">
@@ -273,29 +367,33 @@ $scholarship_options = [
                     <input type="text" name="MiddleName" id="MiddleName">
                 </div>
                 <div class="form-group">
-                    <label>Degree Program</label>
+                    <label>Degree Program *</label>
                     <input type="text" name="DegreeProgram" id="DegreeProgram" required>
                 </div>
                 <div class="form-group">
                     <label>Contact Number</label>
-                    <input type="text" name="ContactNumber" id="ContactNumber">
+                    <input type="text" name="ContactNumber" id="ContactNumber" maxlength="11">
+                    <div class="hint">Must be exactly 11 digits (e.g., 09171234567)</div>
+                    <div class="error-message" id="error_contact">Contact Number must be exactly 11 digits</div>
                 </div>
                 <div class="form-group full-width">
-                    <label>DLSU Email</label>
+                    <label>DLSU Email *</label>
                     <input type="email" name="Email" id="Email" required>
+                    <div class="hint">Format: username@dlsu.edu.ph</div>
+                    <div class="error-message" id="error_email">Email must be in format: username@dlsu.edu.ph</div>
                 </div>
                 <div class="form-group full-width">
-                    <label>Scholarship</label>
-                    <input type="text" name="Scholarship" id="ScholarshipInput" list="schol_suggestions" required>
-                    <datalist id="schol_suggestions">
+                    <label>Scholarship *</label>
+                    <select name="Scholarship" id="ScholarshipSelect" required>
+                        <option value="">-- Select Scholarship --</option>
                         <?php foreach($scholarship_options as $s): ?>
-                            <option value="<?php echo htmlspecialchars($s); ?>">
+                            <option value="<?php echo htmlspecialchars($s); ?>"><?php echo htmlspecialchars($s); ?></option>
                         <?php endforeach; ?>
-                    </datalist>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
-                    <select name="Status" id="Status">
+                    <label>Status *</label>
+                    <select name="Status" id="Status" required>
                         <option value="ACTIVE">ACTIVE</option>
                         <option value="ON LEAVE">ON LEAVE</option>
                         <option value="ALUMNI">ALUMNI</option>
@@ -311,6 +409,134 @@ $scholarship_options = [
 </div>
 
 <script>
+// Store existing ID numbers from database
+const existingIds = <?php echo json_encode($existing_ids); ?>;
+let originalIdNumber = null; // Store original ID when editing
+
+// Get form elements
+const form = document.getElementById('scholarForm');
+const idNumber = document.getElementById('StudentNumber');
+const lastName = document.getElementById('LastName');
+const contactNumber = document.getElementById('ContactNumber');
+const dlsuEmail = document.getElementById('Email');
+const scholarshipSelect = document.getElementById('ScholarshipSelect');
+
+// ID NUMBER VALIDATION - Only allow digits, exactly 8, and check for duplicates
+idNumber.addEventListener('input', function(e) {
+    // Remove non-digits
+    this.value = this.value.replace(/\D/g, '');
+    
+    const errorMsgLength = document.getElementById('error_id');
+    const errorMsgDuplicate = document.getElementById('error_duplicate');
+    const isEdit = document.getElementById('is_edit').value === '1';
+    
+    // Reset error states
+    errorMsgLength.classList.remove('show');
+    errorMsgDuplicate.classList.remove('show');
+    this.classList.remove('input-error');
+    
+    // Validate length
+    if (this.value.length > 0 && this.value.length !== 8) {
+        errorMsgLength.classList.add('show');
+        this.classList.add('input-error');
+    } 
+    // Check for duplicate (only when adding new, not editing)
+    else if (this.value.length === 8 && !isEdit && existingIds.includes(this.value)) {
+        errorMsgDuplicate.classList.add('show');
+        this.classList.add('input-error');
+    }
+});
+
+// LAST NAME - Auto convert to UPPERCASE
+lastName.addEventListener('input', function(e) {
+    this.value = this.value.toUpperCase();
+});
+
+// CONTACT NUMBER VALIDATION - Only allow digits, exactly 11
+contactNumber.addEventListener('input', function(e) {
+    // Remove non-digits
+    this.value = this.value.replace(/\D/g, '');
+    
+    // Validate length
+    const errorMsg = document.getElementById('error_contact');
+    if (this.value.length > 0 && this.value.length !== 11) {
+        errorMsg.classList.add('show');
+        this.classList.add('input-error');
+    } else {
+        errorMsg.classList.remove('show');
+        this.classList.remove('input-error');
+    }
+});
+
+// DLSU EMAIL VALIDATION
+dlsuEmail.addEventListener('blur', function(e) {
+    const emailPattern = /^[a-zA-Z0-9._-]+@dlsu\.edu\.ph$/;
+    const errorMsg = document.getElementById('error_email');
+    
+    if (this.value && !emailPattern.test(this.value)) {
+        errorMsg.classList.add('show');
+        this.classList.add('input-error');
+    } else {
+        errorMsg.classList.remove('show');
+        this.classList.remove('input-error');
+    }
+});
+
+// FORM SUBMISSION VALIDATION
+form.addEventListener('submit', function(e) {
+    let isValid = true;
+    const isEdit = document.getElementById('is_edit').value === '1';
+    
+    // Clear previous errors
+    document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+
+    // Validate ID Number length
+    if (idNumber.value.length !== 8) {
+        document.getElementById('error_id').classList.add('show');
+        idNumber.classList.add('input-error');
+        isValid = false;
+    }
+    
+    // Check for duplicate ID (only when adding new)
+    if (!isEdit && existingIds.includes(idNumber.value)) {
+        document.getElementById('error_duplicate').classList.add('show');
+        idNumber.classList.add('input-error');
+        isValid = false;
+    }
+
+    // Validate Contact Number (if provided)
+    if (contactNumber.value && contactNumber.value.length !== 11) {
+        document.getElementById('error_contact').classList.add('show');
+        contactNumber.classList.add('input-error');
+        isValid = false;
+    }
+
+    // Validate DLSU Email
+    const emailPattern = /^[a-zA-Z0-9._-]+@dlsu\.edu\.ph$/;
+    if (!emailPattern.test(dlsuEmail.value)) {
+        document.getElementById('error_email').classList.add('show');
+        dlsuEmail.classList.add('input-error');
+        isValid = false;
+    }
+
+    if (!isValid) {
+        e.preventDefault();
+        alert('Please correct the errors in the form before submitting.');
+        
+        // Scroll to first error
+        const firstError = document.querySelector('.input-error');
+        if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+});
+
+// Fix scholarship dropdown - ensure it can be changed
+scholarshipSelect.addEventListener('change', function() {
+    this.disabled = false;
+});
+
 function adjustModalScale() {
     const modalContent = document.querySelector('#scholarModal .modal-content');
     if (!modalContent) return;
@@ -332,29 +558,41 @@ function openModal(mode) {
     if(mode === 'add') {
         document.getElementById('modalTitle').innerText = "Add New Scholar";
         document.getElementById('is_edit').value = "0";
-        document.querySelector('form').reset();
+        form.reset();
         document.getElementById('StudentNumber').readOnly = false;
+        originalIdNumber = null;
+        
+        // Clear all error messages
+        document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+        document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
     }
     adjustModalScale();
 }
+
 function closeModal() {
     document.getElementById('scholarModal').classList.remove('active');
 }
+
 function editScholar(data) {
     openModal('edit');
     document.getElementById('modalTitle').innerText = "Edit Scholar";
     document.getElementById('is_edit').value = "1";
     document.getElementById('StudentNumber').value = data.StudentNumber;
-    document.getElementById('StudentNumber').readOnly = true; 
+    document.getElementById('StudentNumber').readOnly = true;
+    originalIdNumber = data.StudentNumber; // Store original ID
     
-    document.getElementById('LastName').value = data.LastName;
+    document.getElementById('LastName').value = data.LastName.toUpperCase();
     document.getElementById('FirstName').value = data.FirstName;
     document.getElementById('MiddleName').value = data.MiddleName;
     document.getElementById('DegreeProgram').value = data.DegreeProgram;
     document.getElementById('Email').value = data.Email;
-    document.getElementById('ScholarshipInput').value = data.Scholarship; 
+    document.getElementById('ScholarshipSelect').value = data.Scholarship; 
     document.getElementById('Status').value = data.Status;
     document.getElementById('ContactNumber').value = data.ContactNumber;
+    
+    // Clear all error messages when editing
+    document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
 }
 </script>
 
