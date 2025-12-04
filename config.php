@@ -1,6 +1,8 @@
 <?php
 // config.php
 
+define('PROJECT_ROOT', __DIR__);
+
 $host = 'localhost';
 $dbname = 'db1'; // Must match the database name in your SQL script
 $username = 'root';

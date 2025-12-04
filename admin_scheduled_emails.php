@@ -1,106 +1,9 @@
 <?php
-// admin_scheduled_emails.php - WITH AUTO-TRIGGER
+// admin_scheduled_emails.php
 
 require_once 'auth_check.php';
 requireAdmin();
 require_once 'config.php';
-
-// ============================================================================
-// AUTO-TRIGGER: Automatically process scheduled emails when page loads
-// ============================================================================
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\SMTP;
-
-require 'PHPMailer/Exception.php';
-require 'PHPMailer/PHPMailer.php';
-require 'PHPMailer/SMTP.php';
-
-// Check for pending emails that need to be sent
-$auto_stmt = $conn->prepare("
-    SELECT * FROM ScheduledEmails 
-    WHERE status = 'pending' 
-    AND scheduled_at <= NOW()
-    ORDER BY scheduled_at ASC
-");
-$auto_stmt->execute();
-$auto_emails = $auto_stmt->fetchAll();
-
-$auto_sent_total = 0;
-
-// Process them automatically in the background
-if (count($auto_emails) > 0) {
-    foreach ($auto_emails as $email_job) {
-        $job_id = $email_job['id'];
-        $target_schol = $email_job['target_scholarship'];
-        $target_status = $email_job['target_status'];
-        $subject_line = $email_job['subject'];
-        $body_content = $email_job['body'];
-        
-        // Build Query to find recipients
-        $sql = "SELECT Email, FirstName, LastName FROM StudentDetails WHERE 1=1";
-        $params = [];
-        
-        if ($target_schol != 'all') {
-            $sql .= " AND Scholarship = ?";
-            $params[] = $target_schol;
-        }
-        if ($target_status != 'all') {
-            $sql .= " AND Status = ?";
-            $params[] = $target_status;
-        }
-        
-        $stmt_recipients = $conn->prepare($sql);
-        $stmt_recipients->execute($params);
-        $recipients = $stmt_recipients->fetchAll();
-        
-        if (count($recipients) > 0) {
-            $mail = new PHPMailer(true);
-
-            try {
-                // Server settings
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';
-                $mail->SMTPAuth = true;
-                $mail->Username = 'societyscholars3@gmail.com';
-                $mail->Password = 'wznztwaofzqwrwqf';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port = 587;
-                $mail->setFrom($mail->Username, 'LSS Admin');
-                $mail->isHTML(true);
-                $mail->Subject = $subject_line;
-
-                // Loop through recipients
-                foreach ($recipients as $student) {
-                    try {
-                        $mail->clearAddresses();
-                        $mail->addAddress($student['Email'], $student['FirstName']);
-                        $personalized_body = str_replace('{name}', $student['FirstName'], $body_content);
-                        $mail->Body = $personalized_body;
-                        $mail->send();
-                        $auto_sent_total++;
-                    } catch (Exception $e) {
-                        $mail->getSMTPInstance()->reset();
-                        continue;
-                    }
-                }
-                
-                // Mark as sent
-                $update_stmt = $conn->prepare("UPDATE ScheduledEmails SET status = 'sent' WHERE id = ?");
-                $update_stmt->execute([$job_id]);
-                
-            } catch (Exception $e) {
-                // Mark as failed
-                $update_stmt = $conn->prepare("UPDATE ScheduledEmails SET status = 'failed' WHERE id = ?");
-                $update_stmt->execute([$job_id]);
-            }
-        } else {
-            // No recipients found, mark as failed
-            $update_stmt = $conn->prepare("UPDATE ScheduledEmails SET status = 'failed' WHERE id = ?");
-            $update_stmt->execute([$job_id]);
-        }
-    }
-}
 
 // ============================================================================
 // REGULAR PAGE LOGIC CONTINUES BELOW
@@ -133,9 +36,22 @@ $scheduled = $stmt->fetchAll();
 $pending_count = 0;
 $sent_count = 0;
 $failed_count = 0;
+$overdue_count = 0;
 
 foreach ($scheduled as $email) {
-    if ($email['status'] == 'pending') $pending_count++;
+    if ($email['status'] == 'pending') {
+        $pending_count++;
+        // Check if overdue
+        $scheduled_time = strtotime($email['scheduled_at']);
+        $current_time = time();
+        
+        // Debug: Log the comparison
+        error_log("Checking email ID {$email['id']}: scheduled_at={$email['scheduled_at']}, scheduled_timestamp={$scheduled_time}, current_timestamp={$current_time}, is_overdue=" . ($scheduled_time <= $current_time ? 'YES' : 'NO'));
+        
+        if ($scheduled_time <= $current_time) {
+            $overdue_count++;
+        }
+    }
     if ($email['status'] == 'sent') $sent_count++;
     if ($email['status'] == 'failed') $failed_count++;
 }
@@ -146,7 +62,7 @@ foreach ($scheduled as $email) {
 <head>
     <meta charset="UTF-8">
     <title>Scheduled Emails - LSS</title>
-    <meta http-equiv="refresh" content="60"> <!-- Auto-refresh every 60 seconds -->
+    <!-- Removed auto-refresh for better performance -->
     <style>
         body { 
             font-family: 'Segoe UI', sans-serif; 
@@ -269,6 +185,33 @@ foreach ($scheduled as $email) {
             font-size: 14px;
         }
         
+        .btn-send-now {
+            background: #ffc107;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-send-now:hover {
+            background: #ffb700;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-send-now:active {
+            transform: translateY(0);
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
         .alert { padding: 15px; border-radius: 5px; margin-bottom: 20px; }
         .alert-success { background: #d4edda; color: #155724; }
         .alert-error { background: #f8d7da; color: #721c24; }
@@ -340,10 +283,46 @@ foreach ($scheduled as $email) {
     </div>
 
     <div class="auto-refresh-notice">
-        ⚡ This page auto-checks for scheduled emails every 60 seconds and sends them automatically
+        ⚡ Page auto-checks every 30 seconds. Overdue emails are sent automatically!
+        <?php if ($overdue_count > 0): ?>
+            <strong style="color: #dc3545;">⏰ Auto-sending <?php echo $overdue_count; ?> overdue email(s) now...</strong>
+        <?php endif; ?>
+        <br>
+        <small>Current Server Time: <?php echo date('Y-m-d h:i:s A'); ?> | 
+        Pending: <?php echo $pending_count; ?> | 
+        Overdue: <?php echo $overdue_count; ?></small>
     </div>
 
     <?php echo $message_status; ?>
+    
+    <?php if(!empty($send_log)): ?>
+        <div class="card" style="background: #f8f9fa; margin-bottom: 20px;">
+            <h3 style="margin-top: 0;">📋 Send Log</h3>
+            <?php echo $send_log; ?>
+        </div>
+    <?php endif; ?>
+
+    <!-- Send Pending Emails Button -->
+    <?php if ($pending_count > 0): ?>
+    <div class="card" style="background: <?php echo $overdue_count > 0 ? '#fff3cd' : '#e7f3ff'; ?>; border-left: 4px solid <?php echo $overdue_count > 0 ? '#ffc107' : '#0056b3'; ?>; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <?php if ($overdue_count > 0): ?>
+                    <h3 style="margin: 0 0 5px 0; color: #856404;">⚠️ <?php echo $overdue_count; ?> Overdue Email(s)</h3>
+                    <p style="margin: 0; color: #856404;">These emails are past their scheduled time and will be sent automatically in 2 seconds...</p>
+                <?php else: ?>
+                    <h3 style="margin: 0 0 5px 0; color: #004085;">📅 <?php echo $pending_count; ?> Pending Email(s)</h3>
+                    <p style="margin: 0; color: #004085;">Scheduled for future. Will send automatically when time arrives.</p>
+                <?php endif; ?>
+            </div>
+            <form method="POST" style="margin: 0;" onsubmit="this.querySelector('button').classList.add('loading'); this.querySelector('button').innerHTML = '⏳ Sending...';">
+                <button type="submit" name="trigger_send" class="btn-send-now">
+                    📧 Send Now (Manual)
+                </button>
+            </form>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <!-- Statistics Cards -->
     <div class="stats-grid">
@@ -440,3 +419,69 @@ foreach ($scheduled as $email) {
 
 </body>
 </html>
+
+<script>
+// Auto-check for pending emails every 30 seconds (in background)
+let isChecking = false;
+let autoSendAttempted = false;
+
+function autoSendNow() {
+    if (autoSendAttempted) {
+        console.log('Auto-send already attempted on this page load');
+        return;
+    }
+    
+    autoSendAttempted = true;
+    console.log('Auto-sending overdue emails...');
+    
+    // Auto-submit the form to trigger sending
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.style.display = 'none';
+    
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'trigger_send';
+    input.value = '1';
+    
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Check immediately on page load if there are overdue emails
+window.addEventListener('DOMContentLoaded', function() {
+    const overdueCount = <?php echo $overdue_count; ?>;
+    const pendingCount = <?php echo $pending_count; ?>;
+    
+    console.log('=== Scheduled Emails Page Loaded ===');
+    console.log('Pending Count:', pendingCount);
+    console.log('Overdue Count:', overdueCount);
+    console.log('Server Time: <?php echo date("Y-m-d H:i:s"); ?>');
+    
+    if (overdueCount > 0) {
+        console.log('Found ' + overdueCount + ' overdue email(s). Auto-sending in 2 seconds...');
+        // Wait 2 seconds then auto-send
+        setTimeout(autoSendNow, 2000);
+    } else if (pendingCount > 0) {
+        console.log('Emails are scheduled but not yet due. Will check again in 30 seconds.');
+    } else {
+        console.log('No pending emails.');
+    }
+});
+
+// Also check every 30 seconds
+setInterval(function() {
+    const overdueCount = <?php echo $overdue_count; ?>;
+    
+    // Only reload to check if we haven't shown a log yet
+    const hasLog = document.querySelector('.card h3') && document.querySelector('.card h3').textContent.includes('Send Log');
+    
+    if (!hasLog && overdueCount > 0) {
+        console.log('30-second check: Found overdue emails, reloading...');
+        location.reload();
+    } else if (!hasLog) {
+        console.log('30-second check: No overdue emails yet.');
+    }
+}, 30000); // 30 seconds
+</script>

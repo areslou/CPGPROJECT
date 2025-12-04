@@ -1,5 +1,7 @@
 <?php
-// send_scheduled_emails.php
+// send_scheduled_emails.php - CRON JOB VERSION
+
+require_once 'config.php';
 
 // --- FORCE ERROR REPORTING ---
 ini_set('display_errors', 1);
@@ -16,9 +18,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\SMTP;
 
-require 'PHPMailer/Exception.php';
-require 'PHPMailer/PHPMailer.php';
-require 'PHPMailer/SMTP.php';
+require_once 'PHPMailer/Exception.php';
+require_once 'PHPMailer/PHPMailer.php';
+require_once 'PHPMailer/SMTP.php';
 require_once 'config.php';
 
 // --- LOGGING SETUP ---

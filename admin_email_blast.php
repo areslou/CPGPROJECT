@@ -58,11 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // --- IF SCHEDULING IS ENABLED ---
     if ($schedule_email && !empty($schedule_time)) {
         try {
+            // Convert the datetime-local format to MySQL DATETIME format
+            $mysql_schedule_time = date('Y-m-d H:i:s', strtotime($schedule_time));
+
             $stmt = $conn->prepare(
                 "INSERT INTO ScheduledEmails (subject, body, target_scholarship, target_status, scheduled_at, status) 
                  VALUES (?, ?, ?, ?, ?, 'pending')"
             );
-            $stmt->execute([$subject_line, $body_content, $target_schol, $target_status, $schedule_time]);
+            $stmt->execute([$subject_line, $body_content, $target_schol, $target_status, $mysql_schedule_time]);
             $message_status = "<span style='color:green;'>✅ Success! Your email has been scheduled for " . date("F j, Y, g:i a", strtotime($schedule_time)) . ".</span>";
         } catch (PDOException $e) {
             $message_status = "<span style='color:red;'>❌ Database Error: Could not schedule the email. " . $e->getMessage() . "</span>";
@@ -225,14 +228,17 @@ $scholarship_options = [
     <a href="admin_dashboard.php" class="menu-item">Dashboard</a>
     <a href="admin_scholars.php" class="menu-item">Scholars Database</a>
     <a href="admin_email_blast.php" class="menu-item active">Email Blast</a>
+    <a href="admin_scheduled_emails.php" class="menu-item">Scheduled Emails</a>
     <a href="logout.php" class="menu-item" style="margin-top: 20px; background: #005c40;">Logout</a>
 </aside>
 
 <main class="main-content">
     <div class="top-bar">
         <h1 style="color:black; margin:0;">📢 Email Blast</h1>
-        <!-- BACK BUTTON -->
-        <a href="admin_dashboard.php" class="btn-secondary">← Back to Dashboard</a>
+        <div>
+            <a href="admin_scheduled_emails.php" class="btn-secondary" style="margin-right: 10px;">📅 View Scheduled</a>
+            <a href="admin_dashboard.php" class="btn-secondary">← Back to Dashboard</a>
+        </div>
     </div>
 
     <?php if($message_status): ?>
