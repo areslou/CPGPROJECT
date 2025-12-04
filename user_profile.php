@@ -84,8 +84,8 @@ if (!$me) {
     <div class="container">
         <div class="card">
             <div class="profile-pic">
-                <?php if (!empty($me['ProfilePic'])): ?>
-                    <img src="uploads/profile/<?php echo htmlspecialchars($me['ProfilePic']); ?>" 
+                <?php if (!empty($me['ProfilePicture'])): ?>
+                    <img src="uploads/profile/<?php echo htmlspecialchars($me['ProfilePicture']); ?>" 
                         style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
                 <?php else: ?>
                     🎓
