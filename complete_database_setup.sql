@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS StudentDetails (
     Scholarship   VARCHAR(150),
     Status        VARCHAR(20),
     ContactNumber VARCHAR(20),
-    ProfilePicture VARCHAR(255) NULL
+    ProfilePicture VARCHAR(255) NULL,
+    SubmissionProof VARCHAR(255) NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS users (
