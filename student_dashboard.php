@@ -8,6 +8,45 @@ $student_number = $_SESSION['student_number'];
 $message = "";
 $message_type = "";
 
+// --- HANDLE PROFILE PICTURE UPLOAD ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) {
+    $target_dir = "uploads/";
+    $imageFileType = strtolower(pathinfo($_FILES["profile_picture"]["name"], PATHINFO_EXTENSION));
+    $new_filename = $student_number . '_' . time() . '.' . $imageFileType;
+    $target_file = $target_dir . $new_filename;
+    
+    // Check if image file is a actual image or fake image
+    $check = getimagesize($_FILES["profile_picture"]["tmp_name"]);
+    if($check !== false) {
+        // Allow certain file formats
+        if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+        && $imageFileType != "gif" ) {
+            $message = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+            $message_type = "error";
+        } else {
+            if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
+                // Update database
+                try {
+                    $stmt = $conn->prepare("UPDATE StudentDetails SET ProfilePicture = ? WHERE StudentNumber = ?");
+                    $stmt->execute([$new_filename, $student_number]);
+                    $message = "✅ Profile picture updated successfully.";
+                    $message_type = "success";
+                } catch (PDOException $e) {
+                    $message = "❌ Error updating database: " . $e->getMessage();
+                    $message_type = "error";
+                }
+            } else {
+                $message = "Sorry, there was an error uploading your file.";
+                $message_type = "error";
+            }
+        }
+    } else {
+        $message = "File is not an image.";
+        $message_type = "error";
+    }
+}
+
+
 // --- 1. HANDLE CONTACT NUMBER UPDATE ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_contact'])) {
     $new_contact = trim($_POST['contact_number']);
@@ -61,14 +100,14 @@ $requirements = [
     <style>
         /* LASALLIAN GREEN THEME */
         :root {
-            --primary: #00A36C;
+            --primary: #008259;
             --primary-dark: #006B4A;
             --accent: #f8f9fa;
             --text: #333;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: var(--text); background-image: url('Main Sub Page Background.gif'); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: var(--text); background-image: url('Main%20Sub%20Page%20Background.gif'); }
         
         /* NAVBAR */
         .navbar {
@@ -122,6 +161,12 @@ $requirements = [
             justify-content: center;
             font-size: 2.5rem;
             color: var(--primary);
+            overflow: hidden;
+        }
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .student-name { font-size: 1.2rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.25rem; }
         .student-id { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 1rem; }
@@ -186,7 +231,13 @@ $requirements = [
     <aside>
         <div class="card profile-card">
             <div class="card-body">
-                <div class="profile-avatar">🎓</div>
+                <div class="profile-avatar">
+                    <?php if (!empty($student['ProfilePicture'])): ?>
+                        <img src="uploads/<?= htmlspecialchars($student['ProfilePicture']) ?>" alt="Profile Picture">
+                    <?php else: ?>
+                        👤
+                    <?php endif; ?>
+                </div>
                 <div class="student-name">
                     <?= htmlspecialchars($student['FirstName'] . ' ' . $student['LastName']) ?>
                 </div>
@@ -195,6 +246,18 @@ $requirements = [
                 <span class="status-badge status-<?= str_replace(' ', '-', $student['Status']) ?>">
                     <?= htmlspecialchars($student['Status']) ?>
                 </span>
+
+                <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #eee;">
+
+                <div class="edit-form">
+                    <form action="student_dashboard.php" method="post" enctype="multipart/form-data">
+                        <label class="form-label">Change Profile Picture</label>
+                        <div class="input-group">
+                            <input type="file" name="profile_picture" class="form-input">
+                            <button type="submit" name="update_picture" class="btn-submit">Upload</button>
+                        </div>
+                    </form>
+                </div>
 
                 <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #eee;">
 

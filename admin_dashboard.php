@@ -39,10 +39,10 @@ try {
     <style>
         /* LASALLIAN GREEN THEME */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; display: flex; height: 100vh; background-image: url('Main Sub Page Background.gif'); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; display: flex; height: 100vh; background-image: url('Main%20Sub%20Page%20Background.gif'); }
         
         /* SIDEBAR */
-        .sidebar { width: 260px; background: #00A36C; color: #fcf9f4; display: flex; flex-direction: column; }
+        .sidebar { width: 260px; background: #008259; color: #fcf9f4; display: flex; flex-direction: column; }
         .sidebar-header { padding: 25px 20px; background: #006B4A; }
         .sidebar-menu { padding: 20px 0; flex: 1; }
         .menu-item { padding: 15px 25px; color: #fcf9f4; text-decoration: none; display: block; transition: 0.3s; border-left: 4px solid transparent; }

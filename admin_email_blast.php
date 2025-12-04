@@ -154,9 +154,9 @@ $scholarship_options = [
     <title>Email Blast - LSS</title>
     <style>
         /* Shared CSS */
-        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; display: flex; height: 100vh; margin: 0; background-image: url('Main Sub Page Background.gif');}
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; display: flex; height: 100vh; margin: 0; background-image: url('Main%20Sub%20Page%20Background.gif');}
         
-        .sidebar { width: 260px; background: #00A36C; color: #fcf9f4; display: flex; flex-direction: column; }
+        .sidebar { width: 260px; background: #008259; color: #fcf9f4; display: flex; flex-direction: column; }
         .sidebar-header { padding: 25px 20px; background: #006B4A; }
         .menu-item { padding: 15px 25px; color: #fcf9f4; text-decoration: none; display: block; border-left: 4px solid transparent; transition: 0.3s; }
         .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); border-left-color: #7FE5B8; }
@@ -191,7 +191,7 @@ $scholarship_options = [
 
 <main class="main-content">
     <div class="top-bar">
-        <h1 style="color:#00A36C; margin:0;">📢 Email Blast</h1>
+        <h1 style="color:black; margin:0;">📢 Email Blast</h1>
         <!-- BACK BUTTON -->
         <a href="admin_dashboard.php" class="btn-secondary">← Back to Dashboard</a>
     </div>

@@ -1,5 +1,6 @@
 <?php
 // config.php
+
 $host = 'localhost';
 $dbname = 'db1'; // Must match the database name in your SQL script
 $username = 'root';
