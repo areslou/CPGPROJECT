@@ -19,6 +19,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_contact'])) {
     }
 }
 
+// --- HANDLE PROFILE PICTURE UPLOAD ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile_pic'])) {
+    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES['profile_pic']['tmp_name'];
+        $fileName = $_FILES['profile_pic']['name'];
+        $fileSize = $_FILES['profile_pic']['size'];
+        $fileType = $_FILES['profile_pic']['type'];
+        $fileNameCmps = explode(".", $fileName);
+        $fileExtension = strtolower(end($fileNameCmps));
+
+        // Allowed file extensions
+        $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (in_array($fileExtension, $allowedExts)) {
+            // Rename file to avoid conflicts
+            $newFileName = $student_id . '.' . $fileExtension;
+            $uploadFileDir = 'uploads/profile_pics/';
+            if (!is_dir($uploadFileDir)) {
+                mkdir($uploadFileDir, 0777, true);
+            }
+            $dest_path = $uploadFileDir . $newFileName;
+
+            if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                // Update database
+                $stmt = $conn->prepare("UPDATE StudentDetails SET ProfilePic = ? WHERE StudentNumber = ?");
+                $stmt->execute([$newFileName, $student_id]);
+                $message = "✅ Profile picture updated!";
+            } else {
+                $message = "❌ Error moving uploaded file.";
+            }
+        } else {
+            $message = "❌ Invalid file type. Only JPG, PNG, GIF allowed.";
+        }
+    } else {
+        $message = "❌ No file uploaded or upload error.";
+    }
+}
+
+
 // --- FETCH LATEST DATA ---
 $stmt = $conn->prepare("SELECT * FROM StudentDetails WHERE StudentNumber = ?");
 $stmt->execute([$student_id]);
@@ -84,13 +123,27 @@ if (!$me) {
     <div class="container">
         <div class="card">
             <div class="profile-pic">
-                <?php if (!empty($me['ProfilePic'])): ?>
-                    <img src="uploads/profile/<?php echo htmlspecialchars($me['ProfilePic']); ?>" 
-                        style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
-                <?php else: ?>
-                    🎓
-                <?php endif; ?>
+                <?php
+                if (!empty($me['ProfilePic']) && file_exists('uploads/profile_pics/' . $me['ProfilePic'])) {
+                    echo '<img src="uploads/profile_pics/' . $me['ProfilePic'] . '" style="width:100%; height:100%; border-radius:50%;">';
+                } else {
+                    echo '🎓';
+                }
+                ?>
             </div>
+
+            <div class="edit-zone">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="info-group" style="margin-bottom: 10px;">
+                        <label>Upload Profile Picture</label>
+                    </div>
+                    <div class="form-row">
+                        <input type="file" name="profile_pic" accept="image/*">
+                        <button type="submit" name="update_profile_pic" class="save-btn">Upload</button>
+                    </div>
+                </form>
+            </div>
+
             <div class="student-name"><?php echo htmlspecialchars($me['FirstName'] . ' ' . $me['LastName']); ?></div>
             <div class="student-id">ID: <?php echo htmlspecialchars($me['StudentNumber']); ?></div>
             
