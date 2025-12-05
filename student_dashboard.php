@@ -152,7 +152,8 @@ $requirements = [['title' => 'Term 1 GPA Submission', 'date' => 'Dec 20, 2025', 
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
         
         .status-badge { padding: 0.35rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
-        .status-ACTIVE { background: #d4edda; color: #155724; }
+        .status-badge.status-ACTIVE { background: #d4edda; color: #155724; }
+        .status-badge.status-Missing { background: #ffdddd; color: #842029; }
         
         /* HIDDEN SECTIONS: Edit forms and static details toggle visibility */
         .avatar-edit-area, .personal-details-editor, .scholarship-edit-area { display: none; }
@@ -314,7 +315,7 @@ $requirements = [['title' => 'Term 1 GPA Submission', 'date' => 'Dec 20, 2025', 
                 <tr>
                     <td><?= $task['title'] ?></td>
                     <td><?= $task['date'] ?></td>
-                    <td><span class="task-status status-<?= str_replace(' ', '-', $task['status']) ?>"><?= $task['status'] ?></span></td>
+                    <td><span class="status-badge status-<?= str_replace(' ', '-', $task['status']) ?>"><?= $task['status'] ?></span></td>
                 </tr>
                 <?php endforeach; ?>
             </table>
