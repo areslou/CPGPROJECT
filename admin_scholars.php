@@ -363,7 +363,7 @@ $scholarship_options = [
                     </td>
                     <td>
                         <button onclick='editScholar(<?php echo json_encode($row); ?>)' class="btn btn-secondary btn-action">Edit</button>
-                        <a href="?delete=<?php echo $row['StudentNumber']; ?>" class="btn btn-danger btn-action" onclick="return confirm('Delete this scholar?')">Del</a>
+                        <a href="?delete=<?php echo $row['StudentNumber']; ?>" class="btn btn-danger btn-action" onclick="return confirm('Delete this scholar?')">Delete</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>
