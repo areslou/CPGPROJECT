@@ -12,17 +12,31 @@ CREATE TABLE IF NOT EXISTS ScheduledEmails (
     target_scholarship VARCHAR(255) NOT NULL,
     target_status VARCHAR(50) NOT NULL,
     scheduled_at DATETIME NOT NULL,
-    status ENUM('pending', 'sent', 'failed') DEFAULT 'pending',
+    status ENUM('pending', 'sent', 'failed', 'cancelled') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_status (status),
     INDEX idx_scheduled_at (scheduled_at),
     INDEX idx_status_scheduled (status, scheduled_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 2. Verify table structure
-DESCRIBE ScheduledEmails;
+-- 2. Create a table for Email History (Sent/Failed/Pending)
+CREATE TABLE IF NOT EXISTS EmailLogs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject VARCHAR(255) NOT NULL,
+    body TEXT,
+    target_group VARCHAR(100),
+    status ENUM('sent', 'pending', 'failed', 'cancelled') NOT NULL,
+    recipient_count INT DEFAULT 0,
+    scheduled_at TIMESTAMP NULL,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    error_message TEXT
+) ENGINE=InnoDB;
 
--- 3. Sample data insert (for testing - delete after testing)
+-- 3. Verify table structure
+DESCRIBE ScheduledEmails;
+DESCRIBE EmailLogs;
+
+-- 4. Sample data insert (for testing - delete after testing)
 -- Uncomment the lines below to insert test data:
 
 /*
@@ -47,8 +61,7 @@ VALUES
 );
 */
 
-<<<<<<< HEAD
--- 4. Useful queries for monitoring
+-- 5. Useful queries for monitoring
 
 -- View all scheduled emails
 SELECT * FROM ScheduledEmails ORDER BY scheduled_at DESC;
@@ -77,7 +90,7 @@ SELECT * FROM ScheduledEmails
 WHERE status = 'failed' 
 ORDER BY scheduled_at DESC;
 
--- 5. Maintenance queries
+-- 6. Maintenance queries
 
 -- Delete old sent emails (older than 30 days)
 -- CAREFUL: This permanently deletes records!
@@ -103,7 +116,7 @@ SET status = 'pending'
 WHERE id = 1;
 */
 
--- 6. Performance optimization (optional - for large datasets)
+-- 7. Performance optimization (optional - for large datasets)
 
 -- Add indexes if not already present
 /*
@@ -133,26 +146,3 @@ ALTER TABLE ScheduledEmails ADD INDEX idx_created_at (created_at);
 --   → DROP TABLE IF EXISTS ScheduledEmails;
 --   → Then run this entire script again
 -- ========================================================================
-=======
-CREATE INDEX idx_scheduled_at_status ON ScheduledEmails (scheduled_at, status);
-
--- Create a table for Email History (Sent/Failed/Pending)
-CREATE TABLE IF NOT EXISTS EmailLogs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    subject VARCHAR(255) NOT NULL,
-    body TEXT,
-    target_group VARCHAR(100),
-    status ENUM('sent', 'pending', 'failed') NOT NULL,
-    recipient_count INT DEFAULT 0,
-    scheduled_at TIMESTAMP NULL,
-    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    error_message TEXT
-) ENGINE=InnoDB;
-
-
--- (Optional) If you already have ScheduledEmails, you can drop it and use EmailLogs for everything, 
--- but to keep your current logic safe, we will just sync them in the PHP code.
-
-ALTER TABLE EmailLogs MODIFY COLUMN status ENUM('sent', 'pending', 'failed', 'cancelled');
-ALTER TABLE ScheduledEmails MODIFY COLUMN status ENUM('sent', 'pending', 'failed', 'cancelled');
->>>>>>> 22a0acbee080d9869e29abc17cb639ddbc2893e3
