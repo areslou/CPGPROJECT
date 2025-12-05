@@ -282,18 +282,8 @@ $requirements = [['title' => 'Term 1 GPA Submission', 'date' => 'Dec 20, 2025', 
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .student-name { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.5rem; margin-bottom: 0.25rem; }
-        .student-id { color: var(--text-secondary); font-weight: 500; margin-bottom: 1rem; }
         
-        .status-badge { 
-            padding: 0.5rem 1rem; 
-            border-radius: 20px; 
-            font-size: 0.85rem; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            display: inline-block;
-            margin-bottom: 1.5rem;
-        }
+        .status-badge { padding: 0.35rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
         .status-ACTIVE { background: #d4edda; color: #155724; }
         
         /* Section Headers */
@@ -478,30 +468,25 @@ $requirements = [['title' => 'Term 1 GPA Submission', 'date' => 'Dec 20, 2025', 
         </div>
 
         <div class="card requirement-tracker-section">
+            <div class="card-header"><h3>📋 Requirements Tracker</h3></div>
+            <table class="task-table">
+                <tr><th>Task</th><th>Deadline</th><th>Status</th></tr>
+                <?php foreach($requirements as $task): ?>
+                <tr>
+                    <td><?= $task['title'] ?></td>
+                    <td><?= $task['date'] ?></td>
+                    <td><span class="task-status status-<?= str_replace(' ', '-', $task['status']) ?>"><?= $task['status'] ?></span></td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
             <div class="card-body">
-                <h3 class="section-title">📋 Requirements Tracker</h3>
-                <table class="task-table">
-                    <?php foreach($requirements as $task): ?>
-                    <tr class="task-row">
-                        <td><?= $task['title'] ?><br><span style="font-size: 0.85rem; color: var(--text-secondary);">Due: <?= $task['date'] ?></span></td>
-                        <td><span class="status-badge status-<?= str_replace(' ', '-', $task['status']) ?>" style="margin-bottom: 0;"><?= $task['status'] ?></span></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </table>
-                
-                <div style="margin-top: 2rem;">
-                    <h3 class="section-title" style="font-size: 1rem;">Submit Proof</h3>
-                    <?php if($message && isset($_FILES['requirement'])): ?>
-                        <div class="alert alert-<?= $message_type ?>"><?= $message ?></div>
-                    <?php endif; ?>
-                    <form method="post" enctype="multipart/form-data">
-                        <label class="form-label">Upload PDF</label>
-                        <div class="input-group">
-                            <input type="file" name="requirement" class="form-input" accept=".pdf">
-                            <button type="submit" name="update_requirement" class="btn btn-primary" style="width: auto; padding-left: 2rem; padding-right: 2rem;">Submit</button>
-                        </div>
-                    </form>
-                </div>
+                <form method="post" enctype="multipart/form-data">
+                    <label class="form-label">Submit Proof (PDF)</label>
+                    <div class="input-group">
+                        <input type="file" name="requirement" class="form-input" accept=".pdf">
+                        <button type="submit" name="update_requirement" class="btn-submit">Submit</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div> </div> <script>
