@@ -159,7 +159,18 @@ $scholarship_options = [
         .btn { padding: 1rem 2rem; border: none; border-radius: 0.5rem; cursor: pointer; color: #fcf9f4; font-weight: 600; text-decoration: none; display: inline-block;}
         .btn-primary { background: #00A36C; }
         .btn-secondary { background: #6c757d; }
-        .btn-danger { background: #dc3545; font-size: 1.2rem; padding: 0.5rem 1rem; }
+        
+        /* UPDATED: Action Button Styling for Alignment */
+        .btn-action {
+            width: 6rem; /* Fixed width ensures they are same length */
+            text-align: center;
+            font-size: 1.2rem;
+            padding: 0.5rem 0; /* Vertical padding */
+            display: inline-block;
+            margin: 0.2rem;
+        }
+        
+        .btn-danger { background: #dc3545; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
         th { text-align: left; padding: 1.5rem; background: #f8f9fa; color: #00A36C; border-bottom: 0.2rem solid #ddd; }
@@ -259,7 +270,6 @@ $scholarship_options = [
         <p>Lasallian Scholars Society</p>
     </div>
     <nav class="sidebar-menu">
-        <!-- LINK TO DASHBOARD -->
         <a href="admin_dashboard.php" class="menu-item">Dashboard</a>
         <a href="admin_scholars.php" class="menu-item active">Scholars Database</a>
         <a href="admin_email_blast.php" class="menu-item">Email Blast</a>
@@ -270,7 +280,6 @@ $scholarship_options = [
 <main class="main-content">
     <div class="top-bar">
         <h1>Scholars Database</h1>
-        <!-- BACK BUTTON -->
         <a href="admin_dashboard.php" class="btn btn-secondary">← Back to Dashboard</a>
     </div>
 
@@ -353,8 +362,8 @@ $scholarship_options = [
                         </span>
                     </td>
                     <td>
-                        <button onclick='editScholar(<?php echo json_encode($row); ?>)' class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;">Edit</button>
-                        <a href="?delete=<?php echo $row['StudentNumber']; ?>" class="btn btn-danger" onclick="return confirm('Delete this scholar?')">Del</a>
+                        <button onclick='editScholar(<?php echo json_encode($row); ?>)' class="btn btn-secondary btn-action">Edit</button>
+                        <a href="?delete=<?php echo $row['StudentNumber']; ?>" class="btn btn-danger btn-action" onclick="return confirm('Delete this scholar?')">Delete</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -363,7 +372,6 @@ $scholarship_options = [
     </div>
 </main>
 
-<!-- MODAL FORM -->
 <div id="scholarModal" class="modal">
     <div class="modal-content">
         <h2 id="modalTitle">Add Scholar</h2>
